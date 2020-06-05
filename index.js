@@ -11,7 +11,10 @@ bot.on('ready', () => {
 
 bot.on('message', message => {
 
-    let args = message.content.substring(prefix.length).split(" ");
+    if (!message.content.startsWith(prefix))
+        return;
+        
+    let args = message.content.slice(prefix.length).split(' ');
 
     switch (args[0].toLowerCase()) {
         case 'ping':
