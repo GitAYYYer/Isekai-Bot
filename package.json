@@ -9,6 +9,7 @@
   "author": "Matthew Moloney",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "discord.js": "^12.2.0",
+    "humanize-duration": "^3.23.0"
   }
 }
