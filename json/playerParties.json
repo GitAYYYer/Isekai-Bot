@@ -1,6 +1,7 @@
 {
-    "partyid1": {
-      "leader": "name",
-      "members": []
-    }
+  "partyid1": {
+    "leader": "name",
+    "adventureId": 784,
+    "members": []
   }
+}

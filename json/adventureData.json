@@ -1,5 +1,5 @@
 {
-    "adv1": {
+    "1": {
       "name": "my first adventure",
       "moneyRewardsRange": [10,13],
       "itemDrops" : [],
