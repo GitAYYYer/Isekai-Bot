@@ -85,12 +85,19 @@ bot.on("message", (message) => {
 });
 
 /*
+Faster to do mentionUser(authorId) than to do the concatenated string.
+*/
+function mentionUser(authorId) {
+    return "<@" + authorId + ">";
+}
+
+/*
 Helper function to get random int between a min and max.
 */
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * (max - min)) + min; // Maximum is exclusive, minimum is inclusive.
 }
 
 /*
@@ -98,15 +105,7 @@ Helper function to return the save data as JSON map.
 No need for arguments, since it's always using the same path.
 */
 function getJsonData(path) {
-    let saveData = JSON.parse(fs.readFileSync(path, 'utf-8'));
-    return saveData;
-}
-
-/*
-Helper function to get the cooldowns.json as an object to use.
-*/
-function getCooldowns() {
-    return JSON.parse(fs.readFileSync(cooldownsPath, 'utf-8'));
+    return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
 /*
@@ -134,6 +133,19 @@ function createNewPlayer(authorId) {
     return currentSaveData;
 }
 
+/*
+Helper function to populate all necessary cooldowns for new players.
+*/
+function createCooldowns(authorId) {
+    let currentCooldowns = getJsonData(cooldownsPath);
+    currentCooldowns[authorId] = {
+        train: Date.now(),
+        work: Date.now(),
+        adventure: Date.now()
+    }
+    return currentCooldowns;
+}
+
 function createNewAdventure(id, advDataId, duration) {
     console.log("attempting to add a new json adventure with id " + advDataId + " and duration " + duration);
     let currentSaveData = getJsonData(playerAdventuresPath);
@@ -158,13 +170,6 @@ function createNewParty(id, playerId) {
 }
 
 /*
-Faster to do mentionUser(authorId) than to do the concatenated string.
-*/
-function mentionUser(authorId) {
-    return "<@" + authorId + ">";
-}
-
-/*
 Creates new save data for a user with their id as the key.
 If id already exists in the file, return immediately.
 */
@@ -180,6 +185,8 @@ function start(message) {
 
     // Passed all checks, append a new user id key to the current file.
     writeJson(saveDataPath, createNewPlayer(authorId));
+    // Also add all cooldowns 
+    writeJson(cooldownsPath, createCooldowns(authorId));
 
     message.channel.send("Created a new save for " + mentionUser(authorId) + "!");
 }
@@ -208,35 +215,26 @@ function display(message) {
 
 function train(message) {
     var authorId = message.author.id;
-    var trainingCooldown = getCooldowns()[authorId]["train"];
-    console.log("Date.now() = " + Date.now());
-    console.log("Date.parse(trainingCooldown) = " + Date.parse(trainingCooldown));
+    var trainingCooldown = getJsonData(cooldownsPath)[authorId]["train"];
+
     if (Date.now() < trainingCooldown) {
         let remainingTime = humanizeDuration(trainingCooldown - Date.now());
         message.channel.send("You've already trained your butt off today " + mentionUser(authorId) + "! Train again in " + remainingTime);
     } else {
         message.channel.send("You've done your training for the day!");
-        let currentSaveData = getJsonData();
-        let cooldowns = getCooldowns();
+        let currentSaveData = getJsonData(saveDataPath);
+        let cooldowns = getJsonData(cooldownsPath);
 
         // The minimum xp gain is 1% of your xp needed to level up.
         let minXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.01;
         // The maximum xp gain is 10% of your xp needed to level up.
         let maxXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.10;
         currentSaveData[authorId]['currentXp'] = parseInt(currentSaveData[authorId]['currentXp']) + getRandomInt(minXpGain, maxXpGain);
+        writeJson(saveDataPath, currentSaveData);
 
-        fs.writeFileSync(
-            saveDataPath,
-            JSON.stringify(currentSaveData, null, 2),
-            function writeJSON(err) {
-                if (err) throw err;
-            }
-        )
-
-        // 5 seconds from now is the time in which the player can train again.
+        // They can train again in 24 hours.
         cooldowns[authorId]["train"] = Date.now() + 86400000;
         writeJson(cooldownsPath, cooldowns);
-
     }
 }
 
@@ -372,12 +370,6 @@ function adventureStatus() {
 
 function adventureComplete() {
 
-}
-
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
 function writeJson(path, jsonString) {

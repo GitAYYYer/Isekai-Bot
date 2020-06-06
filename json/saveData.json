@@ -1,26 +1,38 @@
 {
   "175880304525836288": {
-    "level": 1,
-    "currentXp": 13,
+    "level": 0,
+    "currentXP": 0,
     "xpToNextLevel": 100,
+    "stats": {
+      "atk": 10,
+      "def": 10,
+      "hp": 10
+    },
     "currentClass": null,
     "classes": [
       {}
     ],
     "money": 0,
-    "partyId": 6325,
-    "inventory": []
+    "partyId": 366,
+    "inventory": [],
+    "currentXp": null
   },
   "187817424337240064": {
-    "level": 1,
-    "currentXp": 0,
+    "level": 0,
+    "currentXP": 0,
     "xpToNextLevel": 100,
+    "stats": {
+      "atk": 10,
+      "def": 10,
+      "hp": 10
+    },
     "currentClass": null,
     "classes": [
       {}
     ],
     "money": 0,
-    "partyId": 2100,
-    "inventory": []
+    "partyId": 6927,
+    "inventory": [],
+    "currentXp": null
   }
 }
