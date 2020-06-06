@@ -52,7 +52,7 @@ bot.on("message", (message) => {
         case "ratemywaifu":
             switch (args[1].toLowerCase()) {
                 case "endorsi":
-                    message.channel.send("widepeepohappy");
+                    message.channel.send("widePeepoHappy");
                     break;
                 default:
                     message.channel.send("garbo");
@@ -74,45 +74,54 @@ function getSaveData() {
 }
 
 /*
+Helper function to return an object (player) with all necessary starting stats.
+*/
+function createNewPlayer(authorId) {
+    let currentSaveData = getSaveData();
+    currentSaveData[authorId] = {
+        level: 0,
+        xp: 0,
+        currentClass: null,
+        classes: [{
+
+        }],
+        money: 0,
+        partyId: null,
+        inventory: []
+    }
+    return currentSaveData;
+}
+
+/*
+Faster to do mentionUser(authorId) than to do the concatenated string.
+*/
+function mentionUser(authorId) {
+    return "<@" + authorId + ">";
+}
+
+/*
 Creates new save data for a user with their id as the key.
-If the saveData.json already exists, return immediately (change in the future to not bother with a file check maybe).
 If id already exists in the file, return immediately.
 */
 function start(message) {
     var authorId = message.author.id;
-    // Create the first user in a new file.
-    if (!fs.existsSync(saveDataPath)) {
-        var baseFile = {};
-        baseFile[authorId] = {level: 0, name: 'name'};
-        fs.appendFileSync(
-            saveDataPath,
-            JSON.stringify(baseFile, null, 2),
-            function (err) {
-                if (err) throw err;
-            }
-        );
-        message.channel.send("Save file created. First save is <@" + authorId + ">'s.")
-        return;
-    }
 
     // If the id already exists in the save file, don't bother with creating a new user.
     if (getSaveData().hasOwnProperty(authorId)) {
-        message.channel.send("Sorry <@" +authorId + ">, you've already been isekai'd. " 
+        message.channel.send("Sorry " + mentionUser(authorId) + ", you've already been isekai'd. " 
         + "Try prestiging to isekai yourself again!");
         return;
     }
 
     // Passed all checks, append a new user id key to the current file.
-    let currentSaveData = getSaveData();
-    currentSaveData[authorId] = {level: 0, name: 'New Name'};
     fs.writeFileSync(
         saveDataPath,
-        JSON.stringify(currentSaveData, null, 2),
+        JSON.stringify(createNewPlayer(authorId), null, 2),
         function writeJSON(err) {
             if (err) throw err;
         }
     )
-    message.channel.send("Created a new save for <@" + authorId + ">!");
+    message.channel.send("Created a new save for " + mentionUser(authorId) + "!");
 }
 
 /*
@@ -130,7 +139,7 @@ function up(message) {
             if (err) throw err;
         }
     );
-    message.channel.send("<@" + authorId + "> leveled up to level " + currentSaveData[authorId]["level"] + "!");
+    message.channel.send(mentionUser(authorId) + " leveled up to level " + currentSaveData[authorId]["level"] + "!");
 }
 
 /*
