@@ -1,7 +1,8 @@
 {
   "175880304525836288": {
     "level": 1,
-    "xp": 0,
+    "currentXp": 13,
+    "xpToNextLevel": 100,
     "currentClass": null,
     "classes": [
       {}
@@ -11,8 +12,9 @@
     "inventory": []
   },
   "187817424337240064": {
-    "level": 2,
-    "xp": 0,
+    "level": 1,
+    "currentXp": 0,
+    "xpToNextLevel": 100,
     "currentClass": null,
     "classes": [
       {}

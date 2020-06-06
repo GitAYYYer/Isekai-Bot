@@ -4,6 +4,7 @@ const bot = new Discord.Client();
 
 // regular imports
 const fs = require("fs");
+const humanizeDuration = require('humanize-duration');
 
 // save related
 const jsonFolder = "./json";
@@ -11,6 +12,7 @@ const saveDataPath = jsonFolder + "/saveData.json";
 const adventureDataPath = jsonFolder + "/adventureData.json";
 const playerAdventuresPath = jsonFolder + "/playerAdventures.json";
 const playerPartiesPath = jsonFolder + "/playerParties.json";
+const cooldownsPath = jsonFolder + "/cooldowns.json";
 
 //config
 const configFile = require(jsonFolder + "/config.json");
@@ -47,6 +49,10 @@ bot.on("message", (message) => {
             display(message);
             break;
 
+        case "train":
+            train(message);
+            break;
+
         case "ping":
             message.channel.send("don't ping me you fuck");
             break;
@@ -74,6 +80,15 @@ bot.on("message", (message) => {
 });
 
 /*
+Helper function to get random int between a min and max.
+*/
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/*
 Helper function to return the save data as JSON map.
 No need for arguments, since it's always using the same path.
 */
@@ -83,13 +98,26 @@ function getSaveData() {
 }
 
 /*
+Helper function to get the cooldowns.json as an object to use.
+*/
+function getCooldowns() {
+    return JSON.parse(fs.readFileSync(cooldownsPath, 'utf-8'));
+}
+
+/*
 Helper function to return an object (player) with all necessary starting stats.
 */
 function createNewPlayer(authorId) {
     let currentSaveData = getSaveData();
     currentSaveData[authorId] = {
         level: 0,
-        xp: 0,
+        currentXP: 0,
+        xpToNextLevel: 100,
+        stats: {
+            atk: 10,
+            def: 10,
+            hp: 10
+        },
         currentClass: null,
         classes: [{
 
@@ -157,6 +185,45 @@ Debug method to display current level.
 function display(message) {
     console.log("displaying level");
     message.channel.send("Current level is: " + getSaveData()[message.author.id]["level"]);
+}
+
+function train(message) {
+    var authorId = message.author.id;
+    var trainingCooldown = getCooldowns()[authorId]["train"];
+    console.log("Date.now() = " + Date.now());
+    console.log("Date.parse(trainingCooldown) = " + Date.parse(trainingCooldown));
+    if (Date.now() < trainingCooldown) {
+        let remainingTime = humanizeDuration(trainingCooldown - Date.now());
+        message.channel.send("You've already trained your butt off today " + mentionUser(authorId) + "! Train again in " + remainingTime);
+    } else {
+        message.channel.send("You've done your training for the day!");
+        let currentSaveData = getSaveData();
+        let cooldowns = getCooldowns();
+
+        // The minimum xp gain is 1% of your xp needed to level up.
+        let minXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.01;
+        // The maximum xp gain is 10% of your xp needed to level up.
+        let maxXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.10;
+        currentSaveData[authorId]['currentXp'] = parseInt(currentSaveData[authorId]['currentXp']) + getRandomInt(minXpGain, maxXpGain);
+
+        fs.writeFileSync(
+            saveDataPath,
+            JSON.stringify(currentSaveData, null, 2),
+            function writeJSON(err) {
+                if (err) throw err;
+            }
+        )
+
+        // 5 seconds from now is the time in which the player can train again.
+        cooldowns[authorId]["train"] = Date.now() + 86400000;
+        fs.writeFileSync(
+            cooldownsPath,
+            JSON.stringify(cooldowns, null, 2),
+            function writeJSON(err) {
+                if (err) throw err;
+            }
+        )
+    }
 }
 
 function adventureSwitch() {
