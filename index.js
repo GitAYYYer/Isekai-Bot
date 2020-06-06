@@ -75,7 +75,10 @@ bot.on("message", (message) => {
             break;
 
         case "adventure":
-            adventureSwitch(args);
+            adventureSwitch(message, args);
+
+        case "party":
+            partySwitch(message, args);
     }
 });
 
@@ -92,8 +95,8 @@ function getRandomInt(min, max) {
 Helper function to return the save data as JSON map.
 No need for arguments, since it's always using the same path.
 */
-function getSaveData() {
-    let saveData = JSON.parse(fs.readFileSync(saveDataPath, 'utf-8'));
+function getSaveData(path) {
+    let saveData = JSON.parse(fs.readFileSync(path, 'utf-8'));
     return saveData;
 }
 
@@ -108,7 +111,7 @@ function getCooldowns() {
 Helper function to return an object (player) with all necessary starting stats.
 */
 function createNewPlayer(authorId) {
-    let currentSaveData = getSaveData();
+    let currentSaveData = getSaveData(saveDataPath);
     currentSaveData[authorId] = {
         level: 0,
         currentXP: 0,
@@ -129,6 +132,29 @@ function createNewPlayer(authorId) {
     return currentSaveData;
 }
 
+function createNewAdventure(id, advDataId, duration) {
+    console.log("attempting to add a new json adventure with id " + advDataId + " and duration " + duration);
+    let currentSaveData = getSaveData(playerAdventuresPath);
+
+    currentSaveData[id] = {
+        adventureData: advDataId,
+        completion: duration, //add time calcuation
+    }
+    return currentSaveData;
+}
+
+function createNewParty(id, playerId) {
+    console.log("attempting to create a new party with id " + id + " for player: " + mentionUser(playerId));
+    let currentSaveData = getSaveData(playerAdventuresPath);
+
+    currentSaveData[id] = {
+        leader: playerId,
+        adventureId: id,
+        members: [playerId]
+    }
+    return currentSaveData;
+}
+
 /*
 Faster to do mentionUser(authorId) than to do the concatenated string.
 */
@@ -144,9 +170,9 @@ function start(message) {
     var authorId = message.author.id;
 
     // If the id already exists in the save file, don't bother with creating a new user.
-    if (getSaveData().hasOwnProperty(authorId)) {
-        message.channel.send("Sorry " + mentionUser(authorId) + ", you've already been isekai'd. " 
-        + "Try prestiging to isekai yourself again!");
+    if (getSaveData(saveDataPath).hasOwnProperty(authorId)) {
+        message.channel.send("Sorry " + mentionUser(authorId) + ", you've already been isekai'd. "
+            + "Try prestiging to isekai yourself again!");
         return;
     }
 
@@ -167,7 +193,7 @@ Debug method to just level up current player. Don't bother making it clean I thi
 function up(message) {
     console.log("up command");
     var authorId = message.author.id;
-    let currentSaveData = getSaveData();
+    let currentSaveData = getSaveData(saveDataPath);
     currentSaveData[authorId]["level"] = parseInt(currentSaveData[authorId]["level"]) + 1;
     fs.writeFileSync(
         saveDataPath,
@@ -184,7 +210,7 @@ Debug method to display current level.
 */
 function display(message) {
     console.log("displaying level");
-    message.channel.send("Current level is: " + getSaveData()[message.author.id]["level"]);
+    message.channel.send("Current level is: " + getSaveData(saveDataPath)[message.author.id]["level"]);
 }
 
 function train(message) {
@@ -226,11 +252,11 @@ function train(message) {
     }
 }
 
-function adventureSwitch() {
+function adventureSwitch(message, args) {
     switch (args[1]) {
 
         case "start":
-            adventureStart();
+            adventureStart(message, args[2]);
             break;
 
         case "status":
@@ -243,18 +269,97 @@ function adventureSwitch() {
     }
 }
 
-function adventureStart() {
-    //get party id from player info
-    //get player adventure id from party id
-    //use player adventure id to check adventures.json and see if it exists
-    //if exists
-        //don't start
-    //else if not exists
-        //start a new one
-        //check args[2] to see what adventure data id
-        //check stored adventures to see what time and rewards
-        //calculate finish time
-        //store adventure id, finish time and adventure data id
+function partySwitch(message, args) {
+    switch (args[1]) {
+        case "create":
+            partyCreate(message, args[2]);
+            break;
+
+        case "view":
+            partyView(message);
+            break;
+
+        case "leave":
+            partyLeave(message);
+            break;
+
+        case "join":
+            partyLeave(message);
+            break;
+
+        case "invite":
+            partyLeave(message);
+            break;
+    }
+}
+
+function partyCreate(message, args) {
+    let playerParty = getSaveData(saveDataPath);
+    let playerPartyId = playerParty[message.author.id]["partyId"];
+
+    if (!playerPartyId == null || playerPartyId == "") {
+        let newPartyId = getRandomInt(0, 10000);
+        writeJson(playerPartiesPath, createNewParty(newPartyId, message.author.id));
+
+        playerParty[message.author.id]["partyId"] = newPartyId;
+        writeJson(saveDataPath, playerParty);
+
+        message.channel.send("New party has been created with id: " + newPartyId);
+    } else {
+        message.channel.send("You're already in a party with id: " + playerPartyId);
+    }
+}
+
+function adventureStart(message, adventureArgument) {
+    /** PSEUDO
+    get party id from player info
+    get player adventure id from party id
+    use player adventure id to check adventures.json and see if it exists
+    if exists
+    don't start
+    else if not exists
+    start a new one
+    check args[2] to see what adventure data id
+    check stored adventures to see what time and rewards
+    calculate finish time
+    store adventure id, finish time and adventure data id
+     */
+
+    console.log("attemping to start an adventure");
+
+    var authorId = message.author.id;
+
+    var playerPartyId = getSaveData(saveDataPath)[authorId]["partyId"];
+
+    if (playerPartyId != null) {
+        console.log("partyid: " + playerPartyId);
+
+        //get the adventure ID from party
+        let partyAdventure = getSaveData(playerPartiesPath);
+        var partyAdventureId = partyAdventure[playerPartyId]["adventureId"];
+
+        if (partyAdventureId == null || partyAdventureId == "") {
+            console.log("party adventure id is null, can start a new adventure");
+
+            //get adventure data (can move into createNewAdventure())
+            var adventureDuration = getSaveData(adventureDataPath)[adventureArgument]["duration"];
+            var newAdventureId = getRandomInt(1, 1000);
+
+            //write new adventure into playerAdventures
+            writeJson(playerAdventuresPath, createNewAdventure(newAdventureId, adventureArgument, adventureDuration));
+
+            message.channel.send("Started a new adventure for " + mentionUser(authorId) + " on adventure id: " + newAdventureId + "!");
+            partyAdventure[playerPartyId]["adventureId"] = newAdventureId;
+
+            //Overwrite adventure id in party id
+            writeJson(playerPartiesPath, partyAdventure);
+
+        } else {
+            message.channel.send("Already on an adventure, id: " + partyAdventureId);
+        }
+    } else {
+        message.channel.send("Not in a party");
+    }
 }
 
 function adventureStatus() {
@@ -262,18 +367,34 @@ function adventureStatus() {
     //get player adventure id from party id
     //use player adventure id to check adventures.json and see if it exists
     //if not exists
-        //throw error
+    //throw error
     //else if exists
-        //see if global time is later than set completion time
-        //if not
-            //print how long until adventure is finished
-        //else
-            //adventure is ready for completion, use complete (or just do automatically)
+    //see if global time is later than set completion time
+    //if not
+    //print how long until adventure is finished
+    //else
+    //adventure is ready for completion, use complete (or just do automatically)
 
 }
 
 function adventureComplete() {
 
+}
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+function writeJson(path, jsonString) {
+    fs.writeFileSync(
+        path,
+        JSON.stringify(jsonString, null, 2),
+        function writeJSON(err) {
+            if (err) throw err;
+        }
+    )
 }
 
 bot.login(token);

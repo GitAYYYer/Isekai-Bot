@@ -8,7 +8,7 @@
       {}
     ],
     "money": 0,
-    "partyId": null,
+    "partyId": "partyid1",
     "inventory": []
   },
   "187817424337240064": {
@@ -20,7 +20,7 @@
       {}
     ],
     "money": 0,
-    "partyId": null,
+    "partyId": 7121,
     "inventory": []
   }
 }
