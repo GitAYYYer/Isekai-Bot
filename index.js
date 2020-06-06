@@ -61,6 +61,9 @@ bot.on("message", (message) => {
         case "prefix":
             message.channel.send("current prefix is: " + prefix);
             break;
+
+        case "adventure":
+            adventureSwitch(args);
     }
 });
 
@@ -98,6 +101,56 @@ function display() {
     console.log("displaying level");
     let saveDataFile = JSON.parse(fs.readFileSync(saveDataPath, "utf-8"));
     message.channel.send("Current level is: " + saveDataFile["player"]["level"]);
+}
+
+function adventureSwitch() {
+    switch (args[1]) {
+
+        case "start":
+            adventureStart();
+            break;
+
+        case "status":
+            adventureStatus();
+            break;
+
+        case "complete":
+            adventureComplete();
+            break;
+    }
+}
+
+function adventureStart() {
+    //get party id from player info
+    //get player adventure id from party id
+    //use player adventure id to check adventures.json and see if it exists
+    //if exists
+        //don't start
+    //else if not exists
+        //start a new one
+        //check args[2] to see what adventure data id
+        //check stored adventures to see what time and rewards
+        //calculate finish time
+        //store adventure id, finish time and adventure data id
+}
+
+function adventureStatus() {
+    //get party id from player info
+    //get player adventure id from party id
+    //use player adventure id to check adventures.json and see if it exists
+    //if not exists
+        //throw error
+    //else if exists
+        //see if global time is later than set completion time
+        //if not
+            //print how long until adventure is finished
+        //else
+            //adventure is ready for completion, use complete (or just do automatically)
+
+}
+
+function adventureComplete() {
+
 }
 
 bot.login(token);
