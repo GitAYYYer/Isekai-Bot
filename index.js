@@ -70,6 +70,9 @@ bot.on("message", (message) => {
 
         case "adventure":
             adventureSwitch(message, args);
+
+        case "party":
+            partySwitch(message, args);
     }
 });
 
@@ -102,12 +105,24 @@ function createNewPlayer(authorId) {
 }
 
 function createNewAdventure(id, advDataId, duration) {
-    console.log("attempting to add a new json adventure with id " + advDataId + " and duration " + duration );
+    console.log("attempting to add a new json adventure with id " + advDataId + " and duration " + duration);
     let currentSaveData = getSaveData(playerAdventuresPath);
 
     currentSaveData[id] = {
         adventureData: advDataId,
         completion: duration, //add time calcuation
+    }
+    return currentSaveData;
+}
+
+function createNewParty(id, playerId) {
+    console.log("attempting to create a new party with id " + id + " for player: " + mentionUser(playerId));
+    let currentSaveData = getSaveData(playerAdventuresPath);
+
+    currentSaveData[id] = {
+        leader: playerId,
+        adventureId: id,
+        members: [playerId]
     }
     return currentSaveData;
 }
@@ -187,6 +202,47 @@ function adventureSwitch(message, args) {
     }
 }
 
+function partySwitch(message, args) {
+    switch (args[1]) {
+        case "create":
+            partyCreate(message, args[2]);
+            break;
+
+        case "view":
+            partyView(message);
+            break;
+
+        case "leave":
+            partyLeave(message);
+            break;
+
+        case "join":
+            partyLeave(message);
+            break;
+
+        case "invite":
+            partyLeave(message);
+            break;
+    }
+}
+
+function partyCreate(message, args) {
+    let playerParty = getSaveData(saveDataPath);
+    let playerPartyId = playerParty[message.author.id]["partyId"];
+
+    if (!playerPartyId == null || playerPartyId == "") {
+        let newPartyId = getRandomInt(0, 10000);
+        writeJson(playerPartiesPath, createNewParty(newPartyId, message.author.id));
+
+        playerParty[message.author.id]["partyId"] = newPartyId;
+        writeJson(saveDataPath, playerParty);
+
+        message.channel.send("New party has been created with id: " + newPartyId);
+    } else {
+        message.channel.send("You're already in a party with id: " + playerPartyId);
+    }
+}
+
 function adventureStart(message, adventureArgument) {
     /** PSEUDO
     get party id from player info
@@ -217,7 +273,7 @@ function adventureStart(message, adventureArgument) {
 
         if (partyAdventureId == null || partyAdventureId == "") {
             console.log("party adventure id is null, can start a new adventure");
-            
+
             //get adventure data (can move into createNewAdventure())
             var adventureDuration = getSaveData(adventureDataPath)[adventureArgument]["duration"];
             var newAdventureId = getRandomInt(1, 1000);
@@ -262,9 +318,9 @@ function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-  }
+}
 
-  function writeJson(path, jsonString) {
+function writeJson(path, jsonString) {
     fs.writeFileSync(
         path,
         JSON.stringify(jsonString, null, 2),
@@ -272,6 +328,6 @@ function getRandomInt(min, max) {
             if (err) throw err;
         }
     )
-  }
+}
 
 bot.login(token);
