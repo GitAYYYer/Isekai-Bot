@@ -1,17 +1,23 @@
 // discord imports
 const Discord = require("discord.js");
 const bot = new Discord.Client();
-const configFile = require("./config.json");
 
 // regular imports
 const fs = require("fs");
 
+// save related
+const jsonFolder = "./json";
+const saveDataPath = jsonFolder + "/saveData.json";
+const adventureDataPath = jsonFolder + "/adventureData.json";
+const playerAdventuresPath = jsonFolder + "/playerAdventures.json";
+const playerPartiesPath = jsonFolder + "/playerParties.json";
+
+//config
+const configFile = require(jsonFolder + "/config.json");
+
 // config files
 const token = configFile.token;
 const prefix = configFile.prefix;
-
-// save related
-const saveDataPath = "./saveData.json";
 
 bot.on("ready", () => {
     console.log("Bot is online.");

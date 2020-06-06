@@ -1,0 +1,24 @@
+{
+  "175880304525836288": {
+    "level": 1,
+    "xp": 0,
+    "currentClass": null,
+    "classes": [
+      {}
+    ],
+    "money": 0,
+    "partyId": null,
+    "inventory": []
+  },
+  "187817424337240064": {
+    "level": 2,
+    "xp": 0,
+    "currentClass": null,
+    "classes": [
+      {}
+    ],
+    "money": 0,
+    "partyId": null,
+    "inventory": []
+  }
+}
