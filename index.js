@@ -30,15 +30,15 @@ bot.on("message", (message) => {
 
     switch (args[0].toLowerCase()) {
         case "create":
-            start();
+            start(message);
             break;
 
         case "up":
-            up();
+            up(message);
             break;
 
         case "display":
-            display();
+            display(message);
             break;
 
         case "ping":
@@ -52,7 +52,7 @@ bot.on("message", (message) => {
         case "ratemywaifu":
             switch (args[1].toLowerCase()) {
                 case "endorsi":
-                    message.channel.send("widepeepohappy");
+                    message.channel.send("widePeepoHappy");
                     break;
                 default:
                     message.channel.send("garbo");
@@ -67,27 +67,74 @@ bot.on("message", (message) => {
     }
 });
 
-function start() {
-    // Not sure benefit of exists vs existsSync, and with appendFile vs appendFileSync
-    if (!fs.existsSync(saveDataPath)) {
-        fs.appendFileSync(
-            "./saveData.json",
-            '{"player": {"level": 0, "name": "name"}}',
-            function (err) {
-                if (err) throw err;
-                console.log("saved!");
-            }
-        );
-    }
+/*
+Helper function to return the save data as JSON map.
+No need for arguments, since it's always using the same path.
+*/
+function getSaveData() {
+    let saveData = JSON.parse(fs.readFileSync(saveDataPath, 'utf-8'));
+    return saveData;
 }
 
-function up() {
+/*
+Helper function to return an object (player) with all necessary starting stats.
+*/
+function createNewPlayer(authorId) {
+    let currentSaveData = getSaveData();
+    currentSaveData[authorId] = {
+        level: 0,
+        xp: 0,
+        currentClass: null,
+        classes: [{
+
+        }],
+        money: 0,
+        partyId: null,
+        inventory: []
+    }
+    return currentSaveData;
+}
+
+/*
+Faster to do mentionUser(authorId) than to do the concatenated string.
+*/
+function mentionUser(authorId) {
+    return "<@" + authorId + ">";
+}
+
+/*
+Creates new save data for a user with their id as the key.
+If id already exists in the file, return immediately.
+*/
+function start(message) {
+    var authorId = message.author.id;
+
+    // If the id already exists in the save file, don't bother with creating a new user.
+    if (getSaveData().hasOwnProperty(authorId)) {
+        message.channel.send("Sorry " + mentionUser(authorId) + ", you've already been isekai'd. " 
+        + "Try prestiging to isekai yourself again!");
+        return;
+    }
+
+    // Passed all checks, append a new user id key to the current file.
+    fs.writeFileSync(
+        saveDataPath,
+        JSON.stringify(createNewPlayer(authorId), null, 2),
+        function writeJSON(err) {
+            if (err) throw err;
+        }
+    )
+    message.channel.send("Created a new save for " + mentionUser(authorId) + "!");
+}
+
+/*
+Debug method to just level up current player. Don't bother making it clean I think.
+*/
+function up(message) {
     console.log("up command");
-    let currentSaveData = JSON.parse(fs.readFileSync(saveDataPath, "utf-8"));
-    currentSaveData["player"]["level"] =
-        parseInt(currentSaveData["player"]["level"]) + 1;
-    JSON.parse(fs.readFileSync(saveDataPath, "utf-8")).level =
-        parseInt(JSON.parse(fs.readFileSync(saveDataPath, "utf-8")).level) + 1;
+    var authorId = message.author.id;
+    let currentSaveData = getSaveData();
+    currentSaveData[authorId]["level"] = parseInt(currentSaveData[authorId]["level"]) + 1;
     fs.writeFileSync(
         saveDataPath,
         JSON.stringify(currentSaveData, null, 2),
@@ -95,12 +142,15 @@ function up() {
             if (err) throw err;
         }
     );
+    message.channel.send(mentionUser(authorId) + " leveled up to level " + currentSaveData[authorId]["level"] + "!");
 }
 
-function display() {
+/*
+Debug method to display current level.
+*/
+function display(message) {
     console.log("displaying level");
-    let saveDataFile = JSON.parse(fs.readFileSync(saveDataPath, "utf-8"));
-    message.channel.send("Current level is: " + saveDataFile["player"]["level"]);
+    message.channel.send("Current level is: " + getSaveData()[message.author.id]["level"]);
 }
 
 function adventureSwitch() {
