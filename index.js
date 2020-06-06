@@ -309,6 +309,7 @@ function adventureStart(message, adventureArgument) {
     check stored adventures to see what time and rewards
     calculate finish time
     store adventure id, finish time and adventure data id
+    
      */
 
     console.log("attemping to start an adventure");
