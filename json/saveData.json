@@ -58,7 +58,6 @@
     "classes": [
       {}
     ],
-<<<<<<< Updated upstream
     "money": 0,
     "partyId": 0,
     "inventory": []
@@ -76,10 +75,6 @@
     "classes": [
       {}
     ],
-    "money": 0,
-    "partyId": null,
-    "inventory": []
-=======
     "money": 9980,
     "partyId": 6763,
     "inventory": [
@@ -94,6 +89,5 @@
         "quantity": 2
       }
     ]
->>>>>>> Stashed changes
   }
 }
