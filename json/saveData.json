@@ -13,7 +13,7 @@
       {}
     ],
     "money": 38,
-    "partyId": null,
+    "partyId": 6763,
     "inventory": []
   },
   "187817424337240064": {
@@ -30,7 +30,24 @@
       {}
     ],
     "money": 32,
-    "partyId": null,
+    "partyId": 0,
+    "inventory": []
+  },
+  "212926098680446976": {
+    "level": 0,
+    "currentXP": 0,
+    "xpToNextLevel": 100,
+    "stats": {
+      "atk": 10,
+      "def": 10,
+      "hp": 10
+    },
+    "currentClass": null,
+    "classes": [
+      {}
+    ],
+    "money": 0,
+    "partyId": 0,
     "inventory": []
   }
 }
