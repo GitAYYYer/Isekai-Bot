@@ -350,7 +350,7 @@ function partySwitch(message, args) {
             break;
 
         case "invite":
-            partyInvite(message);
+            partyInvite(message, getUserFromMention(args[2]));
             break;
     }
 }
@@ -476,8 +476,61 @@ function partyJoin(message, targetPlayer) {
 
 }
 
-function partyInvite() {
+/*
+Check target player exists, message author is party leader, and party is not full.
+On successful checks, push the target player into the party.
+*/
+function partyInvite(message, targetPlayer) {
+    // Check if targetPlayer is valid
+    if (isNull(targetPlayer)) {
+        message.channel.send(`'${targetPlayer}' is not a valid player. Please enter an existing player.`);
+        return;
+    }
 
+    const authorId = message.author.id;
+    let currentSaveData = getJsonData(saveDataPath);
+    let invitersPartyId = currentSaveData[authorId]['partyId'];
+
+    // Check if inviter is actually in a party
+    if (isNull(invitersPartyId)) {
+        message.channel.send(`${mentionUser(authorId)} is not currently in a party. Join one first before using ${prefix}invite`);
+        return;
+    }
+
+    // Check if targetPlayer is already in a party
+    let inviteePartyId = currentSaveData[targetPlayer]['partyId'];
+    if (!isNull(inviteePartyId)) {
+        message.channel.send(`${mentionUser(targetPlayer)} is already in a party.`);
+        return;
+    }
+
+    message.channel.send(`${mentionUser(authorId)} has invited ${mentionUser(targetPlayer)} to their party.`);
+
+    // Passed all checks, now wait for response from targetPlayer to accept invite.
+    const collector = new Discord.MessageCollector(message.channel, m => m.author.id === targetPlayer, { time: 10000 });
+    collector.on('collect', replyMessage => {
+        if (replyMessage.content.toLowerCase() == 'accept') {
+            replyMessage.channel.send(`${mentionUser(targetPlayer)} has accepted ${mentionUser(authorId)}'s invite.`);
+
+            let party = getJsonData(playerPartiesPath);
+            party[invitersPartyId]['members'].push(targetPlayer);
+            currentSaveData[targetPlayer]['partyId'] = invitersPartyId;
+
+            writeJson(saveDataPath, currentSaveData);
+            writeJson(playerPartiesPath, party);
+            collector.stop('accepted');
+        } else if (replyMessage.content.toLowerCase() == 'decline') {
+            replyMessage.channel.send(`${mentionUser(targetPlayer)} has declined ${mentionUser(authorId)}'s invite.`);
+            collector.stop('declined');
+        } else {
+            replyMessage.channel.send(`Please type 'accept' or 'decline', ${mentionUser(targetPlayer)}.`);
+        }
+    });
+    // Can use either collected.has('accepted')/collected.has('declined'), or reason === 'accepted'/reason === 'declined'
+    collector.on('end', (collected, reason) => {
+        if (reason !== 'accepted' && reason !== 'declined') 
+            message.channel.send(`${mentionUser(targetPlayer)} did not respond to ${mentionUser(authorId)}'s invite.`);
+    })
 }
 
 function adventureStart(message, adventureArgument) {
