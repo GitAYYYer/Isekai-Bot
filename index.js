@@ -389,6 +389,8 @@ function partyLeave(message) {
             party[playerPartyId]["leader"] = members[0]; 
             message.channel.send(mentionUser(members[0]) + " is the new party leader.");
         } 
+    } else {
+        message.channel.send("You have left the party.");
     }
 
     //reset player party id in savedata
