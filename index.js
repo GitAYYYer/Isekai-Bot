@@ -35,7 +35,10 @@ bot.on("message", (message) => {
     if (!message.content.startsWith(prefix)) return;
 
     let args = message.content.slice(prefix.length).split(" ");
-
+    if (!checkSaveExists(message) && args[0].toLowerCase() != "create") {
+        message.channel.send("Sorry, you don't have a save file " + mentionUser(message.author.id) + ". Try doing " + prefix + "create to make a new character.");
+        return;
+    }
     switch (args[0].toLowerCase()) {
         case "create":
             start(message);
@@ -219,8 +222,9 @@ function display(message) {
 
 function checkSaveExists(message) {
     if (!getJsonData(saveDataPath).hasOwnProperty(message.author.id)) {
-        return message.channel.send("Sorry, you don't have a save file " + mentionUser(authorId) + ". Try doing " + prefix + "create to make a new character.");
+        return false;
     }
+    return true;
 }
 
 /*
@@ -228,8 +232,6 @@ Train command gives player free exp, between 5% - 10% of their xpToNextLevel.
 */
 function train(message) {
     var authorId = message.author.id;
-    checkSaveExists(message);
-
     var trainingCooldown = getJsonData(cooldownsPath)[authorId]["train"];
 
     if (Date.now() < trainingCooldown) {
@@ -260,8 +262,6 @@ Work command will give money, calculated based on a formula with your level.
 */
 function work(message) {
     var authorId = message.author.id;
-    checkSaveExists(message);
-
     var workCooldown = getJsonData(cooldownsPath)[authorId]["work"];
 
     if (Date.now() < workCooldown) {
