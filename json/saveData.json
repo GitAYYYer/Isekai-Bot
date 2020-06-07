@@ -12,9 +12,15 @@
     "classes": [
       {}
     ],
-    "money": 38,
+    "money": 49,
     "partyId": 6763,
-    "inventory": []
+    "inventory": [
+      {
+        "name": "Sword",
+        "cost": 10,
+        "quantity": 3
+      }
+    ]
   },
   "187817424337240064": {
     "level": 0,
@@ -29,9 +35,15 @@
     "classes": [
       {}
     ],
-    "money": 32,
+    "money": 21,
     "partyId": 0,
-    "inventory": []
+    "inventory": [
+      {
+        "name": "Sword",
+        "cost": 10,
+        "quantity": 1
+      }
+    ]
   },
   "212926098680446976": {
     "level": 0,
@@ -46,6 +58,7 @@
     "classes": [
       {}
     ],
+<<<<<<< Updated upstream
     "money": 0,
     "partyId": 0,
     "inventory": []
@@ -66,5 +79,21 @@
     "money": 0,
     "partyId": null,
     "inventory": []
+=======
+    "money": 9980,
+    "partyId": 6763,
+    "inventory": [
+      {
+        "name": "Sword",
+        "cost": 10,
+        "quantity": 1
+      },
+      {
+        "name": "Bat",
+        "cost": 5,
+        "quantity": 2
+      }
+    ]
+>>>>>>> Stashed changes
   }
 }

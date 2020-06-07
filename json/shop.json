@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "cost": 10,
+      "name": "Sword"
+    },
+    {
+      "cost": 15,
+      "name": "Hammer"
+    },
+    {
+      "cost": 20,
+      "name": "Gun"
+    },
+    {
+      "cost": 5,
+      "name": "Bat"
+    }
+  ]
+}
