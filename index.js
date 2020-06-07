@@ -53,6 +53,10 @@ bot.on("message", (message) => {
             train(message);
             break;
 
+        case "work":
+            work(message);
+            break;
+
         case "ping":
             message.channel.send("don't ping me you fuck");
             break;
@@ -213,28 +217,71 @@ function display(message) {
     message.channel.send("Current level is: " + getJsonData(saveDataPath)[message.author.id]["level"]);
 }
 
+function checkSaveExists(message) {
+    if (!getJsonData(saveDataPath).hasOwnProperty(message.author.id)) {
+        return message.channel.send("Sorry, you don't have a save file " + mentionUser(authorId) + ". Try doing " + prefix + "create to make a new character.");
+    }
+}
+
+/*
+Train command gives player free exp, between 5% - 10% of their xpToNextLevel.
+*/
 function train(message) {
     var authorId = message.author.id;
+    checkSaveExists(message);
+
     var trainingCooldown = getJsonData(cooldownsPath)[authorId]["train"];
 
     if (Date.now() < trainingCooldown) {
         let remainingTime = humanizeDuration(trainingCooldown - Date.now());
         message.channel.send("You've already trained your butt off today " + mentionUser(authorId) + "! Train again in " + remainingTime);
     } else {
-        message.channel.send("You've done your training for the day!");
         let currentSaveData = getJsonData(saveDataPath);
         let cooldowns = getJsonData(cooldownsPath);
 
-        // The minimum xp gain is 1% of your xp needed to level up.
-        let minXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.01;
+        // The minimum xp gain is 5% of your xp needed to level up.
+        let minXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.05;
         // The maximum xp gain is 10% of your xp needed to level up.
         let maxXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.10;
-        currentSaveData[authorId]['currentXp'] = parseInt(currentSaveData[authorId]['currentXp']) + getRandomInt(minXpGain, maxXpGain);
+        let xpGain = parseInt(currentSaveData[authorId]['currentXP']) + getRandomInt(minXpGain, maxXpGain);
+        currentSaveData[authorId]['currentXP'] = xpGain;
         writeJson(saveDataPath, currentSaveData);
 
         // They can train again in 24 hours.
         cooldowns[authorId]["train"] = Date.now() + 86400000;
         writeJson(cooldownsPath, cooldowns);
+
+        message.channel.send("You've done your training for the day " + mentionUser(authorId) + "! You've gained " + xpGain + "XP.");
+    }
+}
+
+/*
+Work command will give money, calculated based on a formula with your level.
+*/
+function work(message) {
+    var authorId = message.author.id;
+    checkSaveExists(message);
+
+    var workCooldown = getJsonData(cooldownsPath)[authorId]["work"];
+
+    if (Date.now() < workCooldown) {
+        let remainingTime = humanizeDuration(workCooldown - Date.now());
+        message.channel.send("No one is looking for work right now " + mentionUser(authorId) + ". Come check back in " + remainingTime + " for some work!")
+    } else {
+        let currentSaveData = getJsonData(saveDataPath);
+        let cooldowns = getJsonData(cooldownsPath);
+
+        let minMoneyGain = 10;
+        let maxMoneyGain = 50;
+        let moneyGain = getRandomInt(minMoneyGain, maxMoneyGain);
+        currentSaveData[authorId]['money'] = moneyGain;
+        writeJson(saveDataPath, currentSaveData);
+
+        // 30 minutes between working
+        cooldowns[authorId]["work"] = Date.now() + 1800000;
+        writeJson(cooldownsPath, cooldowns);
+
+        message.channel.send("You did some work for the townspeople " + mentionUser(authorId) + "! You've earned $" + moneyGain + ".");
     }
 }
 
