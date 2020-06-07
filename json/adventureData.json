@@ -3,6 +3,6 @@
       "name": "my first adventure",
       "moneyRewardsRange": [10,13],
       "itemDrops" : [],
-      "duration": "10 min"
+      "duration": "5000"
     }
   }
