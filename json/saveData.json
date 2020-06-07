@@ -1,7 +1,7 @@
 {
   "175880304525836288": {
-    "level": 0,
-    "currentXP": 5,
+    "level": 1,
+    "currentXP": 8,
     "xpToNextLevel": 100,
     "stats": {
       "atk": 10,
@@ -48,6 +48,23 @@
     ],
     "money": 0,
     "partyId": 0,
+    "inventory": []
+  },
+  "212926098680446976": {
+    "level": 1,
+    "currentXP": 0,
+    "xpToNextLevel": 100,
+    "stats": {
+      "atk": 10,
+      "def": 10,
+      "hp": 10
+    },
+    "currentClass": null,
+    "classes": [
+      {}
+    ],
+    "money": 0,
+    "partyId": null,
     "inventory": []
   }
 }
