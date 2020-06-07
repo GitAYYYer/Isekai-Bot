@@ -524,6 +524,7 @@ function partyInvite(message, targetPlayer) {
             replyMessage.channel.send(`Please type 'accept' or 'decline', ${mentionUser(targetPlayer)}.`);
         }
     });
+    // Can use either collected.has('accepted')/collected.has('declined'), or reason === 'accepted'/reason === 'declined'
     collector.on('end', (collected, reason) => {
         if (reason !== 'accepted' && reason !== 'declined') 
             message.channel.send(`${mentionUser(targetPlayer)} did not respond to ${mentionUser(authorId)}'s invite.`);
