@@ -297,7 +297,7 @@ function adventureSwitch(message, args) {
             break;
 
         case "complete":
-            adventureComplete();
+            adventureComplete(message);
             break;
     }
 }
@@ -317,11 +317,11 @@ function partySwitch(message, args) {
             break;
 
         case "join":
-            partyLeave(message);
+            partyJoin(message);
             break;
 
         case "invite":
-            partyLeave(message);
+            partyInvite(message);
             break;
     }
 }
@@ -343,6 +343,33 @@ function partyCreate(message, args) {
     }
 }
 
+function partyView(message) {
+    let playerParty = getJsonData(saveDataPath);
+    let playerPartyId = playerParty[message.author.id]["partyId"];
+
+    let party = getJsonData(playerPartiesPath);
+    let members = party[playerPartyId]["members"];
+    console.log(members);
+
+    var printStr = "The current members of your party consist of: ";
+    for (var i = 0; i < members.length; i++) {
+        printStr += mentionUser(members[i]) + ", ";
+    }
+    message.channel.send(printStr);
+}
+
+function partyLeave(message) {
+
+}
+
+function partyJoin(message, targetPlayer) {
+
+}
+
+function partyInvite() {
+
+}
+
 function adventureStart(message, adventureArgument) {
     /** PSEUDO
     get party id from player info
@@ -358,17 +385,21 @@ function adventureStart(message, adventureArgument) {
     store adventure id, finish time and adventure data id
     
      */
+    
+     //check if the adventure the player is embarking on exists
+     if (isNull(adventureArgument) || !getJsonData(adventureDataPath).hasOwnProperty(adventureArgument)) {
+        message.channel.send("Please enter a valid adventure ID.");
+        return;
+    }
 
     console.log("attemping to start an adventure");
 
     let authorId = message.author.id;
 
-    let partyId = getJsonData(saveDataPath)[message.author.id]["partyId"];
+    let partyId = getJsonData(saveDataPath)[authorId]["partyId"];
     let playerParty = getJsonData(playerPartiesPath);
 
-    if (isNull(partyId)) {
-        message.channel.send("Join a party before you adventure");
-    } else {
+    if (!isNull(partyId)) {
         console.log("partyid: " + partyId);
 
         //get the adventure ID from party
@@ -387,7 +418,7 @@ function adventureStart(message, adventureArgument) {
             let newAdventureId = getRandomInt(1, 1000);
 
             //write new adventure into playerAdventures
-            writeJson(playerAdventuresPath, createNewAdventure(newAdventureId, adventureArgument, adventureDuration));
+            writeJson(playerAdventuresPath, createNewAdventure(newAdventureId, adventureArgument, (parseInt(adventureDuration) + Date.now())));
 
             message.channel.send("Started a new adventure for " + mentionUser(authorId) + " on adventure id: " + newAdventureId + "!");
 
@@ -398,8 +429,12 @@ function adventureStart(message, adventureArgument) {
         } else {
             message.channel.send("Already on an adventure, id: " + partyAdventureId);
         }
+    } else {
+        message.channel.send("Join a party first");
+
     }
 }
+
 
 function adventureStatus() {
     //get party id from player info
@@ -416,8 +451,40 @@ function adventureStatus() {
 
 }
 
-function adventureComplete() {
+function adventureComplete(message) {
 
+    let partyId = getJsonData(saveDataPath)[message.author.id]["partyId"];
+    let party = getJsonData(playerPartiesPath);
+
+    if (!isNull(partyId)) {
+
+        let adventureId = party[partyId]["adventureId"];
+
+        if (!isNull(adventureId)) {
+            let adventure = getJsonData(playerAdventuresPath);
+            var completionTime = getJsonData(playerAdventuresPath)[adventureId]["completion"];
+
+            if (Date.now() < completionTime) {
+                let remainingTime = humanizeDuration(completionTime - Date.now());
+                message.channel.send("You haven't completed your adventure yet. Complete in: " + remainingTime);
+            } else {
+                message.channel.send("Completed.");
+
+                //reset adventure id in party
+                party[partyId]["adventureId"] = 0;
+                writeJson(playerPartiesPath, party);
+
+                //delete adventure
+                delete adventure[adventureId];
+                writeJson(playerAdventuresPath, adventure);
+            }
+        } else {
+            message.channel.send("You're not on an adventure.");
+
+        }
+    } else {
+        message.channel.send("You're not even in a party.");
+    }
 }
 
 function writeJson(path, jsonString) {
