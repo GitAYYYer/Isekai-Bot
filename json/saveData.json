@@ -9,10 +9,8 @@
       "hp": 10
     },
     "currentClass": null,
-    "classes": [
-      {}
-    ],
-    "money": 47,
+    "classes": [{}],
+    "money": 15,
     "partyId": null,
     "inventory": []
   },
@@ -26,11 +24,45 @@
       "hp": 10
     },
     "currentClass": null,
-    "classes": [
-      {}
-    ],
-    "money": 0,
+    "classes": [{}],
+    "money": 41,
     "partyId": null,
     "inventory": []
+  },
+  "212926098680446976": {
+    "level": 0,
+    "currentXP": 0,
+    "xpToNextLevel": 100,
+    "stats": {
+      "atk": 10,
+      "def": 10,
+      "hp": 10
+    },
+    "currentClass": null,
+    "classes": [{}],
+    "money": 125,
+    "partyId": null,
+    "inventory": [
+      {
+        "name": "Sword",
+        "cost": 10,
+        "quantity": 3
+      },
+      {
+        "name": "Bat",
+        "cost": 5,
+        "quantity": 1
+      },
+      {
+        "name": "Hammer",
+        "cost": 15,
+        "quantity": 2
+      },
+      {
+        "name": "Gun",
+        "cost": 20,
+        "quantity": 1
+      }
+    ]
   }
 }
