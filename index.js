@@ -14,12 +14,15 @@ const playerAdventuresPath = jsonFolder + "/playerAdventures.json";
 const playerPartiesPath = jsonFolder + "/playerParties.json";
 const cooldownsPath = jsonFolder + "/cooldowns.json";
 
-//config
+// config
 const configFile = require(jsonFolder + "/config.json");
 
 // config files
 const token = configFile.token;
 const prefix = configFile.prefix;
+
+// constant variables
+const xpToNextLevelMultiplier = 1.5;
 
 bot.on("ready", () => {
     console.log("Bot is online.");
@@ -90,6 +93,13 @@ bot.on("message", (message) => {
             break;
     }
 });
+
+function checkSaveExists(message) {
+    if (!getJsonData(saveDataPath).hasOwnProperty(message.author.id)) {
+        return false;
+    }
+    return true;
+}
 
 /*
 Faster to do mentionUser(authorId) than to do the concatenated string.
@@ -220,11 +230,31 @@ function display(message) {
     message.channel.send("Current level is: " + getJsonData(saveDataPath)[message.author.id]["level"]);
 }
 
-function checkSaveExists(message) {
-    if (!getJsonData(saveDataPath).hasOwnProperty(message.author.id)) {
-        return false;
+function checkLevelUpAndChangeXP(message, currentSaveData, xpGain) {
+    const authorId = message.author.id;
+    let currentXP = parseInt(currentSaveData[authorId]['currentXP']);
+    let xpToNextLevel = parseInt(currentSaveData[authorId]['xpToNextLevel']);
+    let currentLevel = parseInt(currentSaveData[authorId]['level']);
+
+    // This case means you need to level up the player.
+    if (currentXP + xpGain >= xpToNextLevel) {
+        let leftoverXP = (currentXP + xpGain) - xpToNextLevel;
+        currentSaveData[authorId]['level'] = currentLevel + 1;
+        currentSaveData[authorId]['currentXP'] = leftoverXP;
+        currentSaveData[authorId]['xpToNextLevel'] = xpToNextLevel * xpToNextLevelMultiplier;
+
+    // This case means just change the currentXP value.
+    } else {
+        currentSaveData[authorId]['currentXP'] = currentXP + xpGain;
     }
-    return true;
+    // Save the changes
+    writeJson(saveDataPath, currentSaveData);
+
+    // There are scenarios where you can level up twice in one xpGain, hence need to check and recall this function.
+    // (I call getJsonData() here because I think currentSaveData will be the OLD copy of the json, before xp and levels are applied)
+    if (parseInt(getJsonData(saveDataPath)[authorId]['currentXP']) >= parseInt(getJsonData(saveDataPath)[authorId]['xpToNextLevel'])) {
+        checkLevelUpAndChangeXP(message, getJsonData(saveDataPath), 0);
+    }
 }
 
 /*
@@ -240,20 +270,23 @@ function train(message) {
     } else {
         let currentSaveData = getJsonData(saveDataPath);
         let cooldowns = getJsonData(cooldownsPath);
+        let previousLevel = currentSaveData[authorId]['level'];
 
         // The minimum xp gain is 5% of your xp needed to level up.
         let minXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.05;
         // The maximum xp gain is 10% of your xp needed to level up.
         let maxXpGain = parseInt(currentSaveData[authorId]['xpToNextLevel']) * 0.10;
-        let xpGain = parseInt(currentSaveData[authorId]['currentXP']) + getRandomInt(minXpGain, maxXpGain);
-        currentSaveData[authorId]['currentXP'] = xpGain;
-        writeJson(saveDataPath, currentSaveData);
+
+        let xpGain = getRandomInt(minXpGain, maxXpGain);
+        message.channel.send("You've done your training for the day " + mentionUser(authorId) + "! You've gained " + xpGain + "XP.");
+        checkLevelUpAndChangeXP(message, currentSaveData, xpGain);
+        // message.channel.send(mentionUser(authorId) + " has leveled up to level " + getJsonData(saveDataPath)[authorId]['level'] + "!");
+        if (previousLevel != getJsonData(saveDataPath)[authorId]['level'])
+            message.channel.send(`${mentionUser(authorId)} has leveled up from level ${previousLevel} to level ${getJsonData(saveDataPath)[authorId]['level']}!`);
 
         // They can train again in 24 hours.
         cooldowns[authorId]["train"] = Date.now() + 86400000;
         writeJson(cooldownsPath, cooldowns);
-
-        message.channel.send("You've done your training for the day " + mentionUser(authorId) + "! You've gained " + xpGain + "XP.");
     }
 }
 
