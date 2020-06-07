@@ -292,10 +292,6 @@ function adventureSwitch(message, args) {
             adventureStart(message, args[2]);
             break;
 
-        case "status":
-            adventureStatus();
-            break;
-
         case "complete":
             adventureComplete(message);
             break;
@@ -317,7 +313,7 @@ function partySwitch(message, args) {
             break;
 
         case "join":
-            partyJoin(message);
+            partyJoin(message, getUserFromMention(args[2]));
             break;
 
         case "invite":
@@ -347,11 +343,16 @@ function partyView(message) {
     let playerParty = getJsonData(saveDataPath);
     let playerPartyId = playerParty[message.author.id]["partyId"];
 
+    if (isNull(playerPartyId)) {
+        message.channel.send("You're not currently in a party.");
+        return;
+    }
+
     let party = getJsonData(playerPartiesPath);
     let members = party[playerPartyId]["members"];
     console.log(members);
 
-    var printStr = "The current members of your party consist of: ";
+    var printStr = "Party leader is: " + mentionUser(party[playerPartyId]["leader"]) + ", The current members of your party consist of: ";
     for (var i = 0; i < members.length; i++) {
         printStr += mentionUser(members[i]) + ", ";
     }
@@ -359,10 +360,84 @@ function partyView(message) {
 }
 
 function partyLeave(message) {
+    let saveData = getJsonData(saveDataPath);
+    let playerPartyId = saveData[message.author.id]["partyId"];
 
+    if (isNull(playerPartyId)) {
+        message.channel.send("Currently not in a party.");
+        return;
+    }
+
+    let party = getJsonData(playerPartiesPath);
+    let members = party[playerPartyId]["members"];
+
+    //remove from members list
+    for (var i = 0; i < members.length; i++) {
+        if (members[i] == message.author.id) {
+            members.splice(i, 1);
+        }
+    }
+
+    //check if they were a leader
+    if (party[playerPartyId]["leader"] == message.author.id) {
+        //if no other members, delete party
+        if (members.length == 0) {
+            delete party[playerPartyId];
+            message.channel.send("Party is now empty, deleting.");
+        } else {
+            //else, designate the next person as leader
+            party[playerPartyId]["leader"] = members[0]; 
+            message.channel.send(mentionUser(members[0]) + " is the new party leader.");
+        } 
+    }
+
+    //reset player party id in savedata
+    saveData[message.author.id]["partyId"] = 0;
+
+    writeJson(saveDataPath, saveData);
+    writeJson(playerPartiesPath, party);
 }
 
 function partyJoin(message, targetPlayer) {
+
+
+    //grab the party id of the target player
+    //see if the party is full
+    //make it the new message author party id
+    //add the member to the party[members]
+
+    if (isNull(targetPlayer)) {
+        message.channel.send("Please enter the target player.");
+        return;
+    }
+    console.log(targetPlayer);
+
+    let playerSave = getJsonData(saveDataPath);
+    
+    //TypeError: Cannot read property 'partyId' of undefined
+    let playerSavePartyId = playerSave[message.author.id]["partyId"];
+
+    if (!isNull(playerSavePartyId)) {
+        message.channel.send("You're already in a party, please leave your current one first.");
+        return;
+    }
+
+    let targetSavePartyId = playerSave[targetPlayer]["partyId"];
+
+    if (isNull(targetSavePartyId)) {
+        message.channel.send("The target player is not currently in a party.");
+        return;
+    }
+
+    let party = getJsonData(playerPartiesPath);
+    party[targetSavePartyId]["members"].push(message.author.id);
+
+    playerSave[message.author.id]["partyId"] = targetSavePartyId;
+
+    writeJson(saveDataPath, playerSave);
+    writeJson(playerPartiesPath, party);
+
+    message.channel.send("Joined party.");
 
 }
 
@@ -435,35 +510,22 @@ function adventureStart(message, adventureArgument) {
     }
 }
 
-
-function adventureStatus() {
-    //get party id from player info
-    //get player adventure id from party id
-    //use player adventure id to check adventures.json and see if it exists
-    //if not exists
-    //throw error
-    //else if exists
-    //see if global time is later than set completion time
-    //if not
-    //print how long until adventure is finished
-    //else
-    //adventure is ready for completion, use complete (or just do automatically)
-
-}
-
 function adventureComplete(message) {
 
     let partyId = getJsonData(saveDataPath)[message.author.id]["partyId"];
     let party = getJsonData(playerPartiesPath);
 
+    //check if they're in a party
     if (!isNull(partyId)) {
 
         let adventureId = party[partyId]["adventureId"];
 
+        //check if they're on an adventure
         if (!isNull(adventureId)) {
             let adventure = getJsonData(playerAdventuresPath);
             var completionTime = getJsonData(playerAdventuresPath)[adventureId]["completion"];
 
+            //if date is past set completion date
             if (Date.now() < completionTime) {
                 let remainingTime = humanizeDuration(completionTime - Date.now());
                 message.channel.send("You haven't completed your adventure yet. Complete in: " + remainingTime);
@@ -480,7 +542,6 @@ function adventureComplete(message) {
             }
         } else {
             message.channel.send("You're not on an adventure.");
-
         }
     } else {
         message.channel.send("You're not even in a party.");
@@ -495,6 +556,20 @@ function writeJson(path, jsonString) {
             if (err) throw err;
         }
     )
+}
+
+function getUserFromMention(mention) {
+	if (!mention) return;
+
+	if (mention.startsWith('<@') && mention.endsWith('>')) {
+		mention = mention.slice(2, -1);
+
+		if (mention.startsWith('!')) {
+			mention = mention.slice(1);
+		}
+
+		return bot.users.cache.get(mention).id;
+	}
 }
 
 function isNull(value) {
