@@ -256,7 +256,7 @@ function train(message) {
 }
 
 /*
-Work command will give free exp, less than training, but will also give money.
+Work command will give money, calculated based on a formula with your level.
 */
 function work(message) {
     var authorId = message.author.id;
