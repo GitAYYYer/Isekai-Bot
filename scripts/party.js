@@ -127,7 +127,14 @@ function partyJoin(message, targetPlayer) {
         return;
     }
 
+
     let playerSave = utils.getJsonData(utils.saveDataPath);
+
+    //if target player exists
+    if (!playerSave.hasOwnProperty(targetPlayer)) {
+        message.channel.send(`${utils.mentionUser(targetPlayer)} has no save data!`);
+        return;
+    }
 
     let playerSavePartyId = playerSave[message.author.id]['partyId'];
 
@@ -172,6 +179,12 @@ function partyInvite(message, targetPlayer) {
     // Check if inviter is actually in a party
     if (utils.isNull(invitersPartyId)) {
         message.channel.send(`${utils.mentionUser(authorId)} is not currently in a party. Join one first before using ${prefix}invite`);
+        return;
+    }
+
+    //if target player exists
+    if (!currentSaveData.hasOwnProperty(targetPlayer)) {
+        message.channel.send(`${utils.mentionUser(targetPlayer)} has no save data!`);
         return;
     }
 

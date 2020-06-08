@@ -7,10 +7,10 @@ const humanizeDuration = require("humanize-duration");
 const ping = require("minecraft-server-util");
 
 //js files
-const adventureController = require("./adventure.js");
-const partyController = require("./party.js");
-const shopController = require("./shop.js");
-const utils = require("./isekaiUtils.js");
+const adventureController = require("./scripts/adventure.js");
+const partyController = require("./scripts/party.js");
+const shopController = require("./scripts/shop.js");
+const utils = require("./scripts/isekaiUtils.js");
 
 // config
 const configFile = require(utils.jsonFolder + "/config.json");
@@ -31,7 +31,7 @@ bot.on("message", (message) => {
     if (!message.content.startsWith(prefix)) return;
 
     let args = message.content.slice(prefix.length).split(" ");
-    if (!checkSaveExists(message) && args[0].toLowerCase() != "create") {
+    if (!utils.checkSaveExists(message) && args[0].toLowerCase() != "create") {
         message.channel.send(`Sorry you don't have save data ${utils.mentionUser(message.author.id)}. Try doing ${prefix}create to make a new character.`);
         return;
     }
@@ -107,10 +107,6 @@ bot.on("message", (message) => {
             mc(message);
     }
 });
-
-function checkSaveExists(message) {
-    return utils.getJsonData(utils.saveDataPath).hasOwnProperty(message.author.id);
-}
 
 /*
 Helper function to return an object (player) with all necessary starting stats.
