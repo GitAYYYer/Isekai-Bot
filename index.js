@@ -118,9 +118,15 @@ function createNewPlayer(authorId) {
         currentXP: 0,
         xpToNextLevel: 100,
         stats: {
-            atk: 10,
-            def: 10,
-            hp: 10,
+            pAtk: 10,
+            mAtk: 10,
+            pDef: 10,
+            mDef: 10,
+            currentHP: 100,
+            maxHP: 100,
+            str: 10,
+            agl: 10,
+            int: 10
         },
         currentClass: null,
         classes: [{}],

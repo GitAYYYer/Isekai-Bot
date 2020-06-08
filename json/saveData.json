@@ -4,64 +4,71 @@
     "currentXP": 8,
     "xpToNextLevel": 100,
     "stats": {
-      "atk": 10,
-      "def": 10,
-      "hp": 10
+      "pAtk": 10,
+      "mAtk": 10,
+      "pDef": 10,
+      "mDef": 10,
+      "currentHP": 100,
+      "maxHP": 100,
+      "str": 10,
+      "agl": 10,
+      "int": 10
     },
     "currentClass": null,
-    "classes": [
-      {}
-    ],
-    "money": 49,
+    "classes": [{}],
+    "money": 495555,
     "partyId": 6936,
-    "inventory": [
-      {
-        "name": "Sword",
-        "cost": 10,
-        "quantity": 3
-      }
-    ]
+    "inventory": [{
+      "name": "Sword",
+      "cost": 10,
+      "quantity": 3
+    }]
   },
   "187817424337240064": {
     "level": 0,
     "currentXP": 0,
     "xpToNextLevel": 100,
     "stats": {
-      "atk": 10,
-      "def": 10,
-      "hp": 10
+      "pAtk": 10,
+      "mAtk": 10,
+      "pDef": 10,
+      "mDef": 10,
+      "currentHP": 100,
+      "maxHP": 100,
+      "str": 10,
+      "agl": 10,
+      "int": 10
     },
     "currentClass": null,
-    "classes": [
-      {}
-    ],
+    "classes": [{}],
     "money": 11,
     "partyId": 6936,
-    "inventory": [
-      {
-        "name": "Sword",
-        "cost": 10,
-        "quantity": 2
-      }
-    ]
+    "inventory": [{
+      "name": "Sword",
+      "cost": 10,
+      "quantity": 2
+    }]
   },
   "212926098680446976": {
     "level": 1,
     "currentXP": 0,
     "xpToNextLevel": 100,
     "stats": {
-      "atk": 10,
-      "def": 10,
-      "hp": 10
+      "pAtk": 10,
+      "mAtk": 10,
+      "pDef": 10,
+      "mDef": 10,
+      "currentHP": 100,
+      "maxHP": 100,
+      "str": 10,
+      "agl": 10,
+      "int": 10
     },
     "currentClass": null,
-    "classes": [
-      {}
-    ],
+    "classes": [{}],
     "money": 9835,
     "partyId": 0,
-    "inventory": [
-      {
+    "inventory": [{
         "name": "Sword",
         "cost": 10,
         "quantity": 2
