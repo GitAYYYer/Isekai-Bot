@@ -105,3 +105,6 @@ dist
 
 #custom config
 config.json
+
+#webstorm
+.idea/

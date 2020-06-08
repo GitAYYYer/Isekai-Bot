@@ -5,6 +5,7 @@ const bot = new Discord.Client();
 // regular imports
 const fs = require("fs");
 const humanizeDuration = require("humanize-duration");
+const ping = require("minecraft-server-util");
 
 // save related
 const jsonFolder = "./json";
@@ -30,6 +31,7 @@ bot.on("ready", () => {
 });
 
 bot.on("message", (message) => {
+    noPrefixListener(message);
     if (!message.content.startsWith(prefix)) return;
 
     let args = message.content.slice(prefix.length).split(" ");
@@ -103,6 +105,9 @@ bot.on("message", (message) => {
             case "i":
                 inventory(message);
                 break;
+
+        case "e2e":
+            mc(message);
     }
 });
 
@@ -787,6 +792,32 @@ function shopBuy(message, itemName) {
         message.channel.send(`${playerName}'s Wallet: $${player.money}`);
         message.channel.send(`Sorry you don't have enough money to buy a ${item.name}. :(`);
     }
+}
+
+function noPrefixListener(message) {
+    switch (message.content.toLowerCase()) {
+        case "garbo":
+        case "who":
+        case "???":
+            message.channel.send("WH <:OMEGALUL:719390337323237410>");
+    }
+}
+
+function mc(message) {
+    ping("122.111.176.250", 25565, (error, response) =>{
+        if(error) {
+            message.channel.send("Server ping timed out.");
+            throw error;
+        }
+        const Embed = new Discord.MessageEmbed()
+            .setTitle('Server Status')
+            .addField('Server IP', response.host)
+            .addField('Server Version', response.version)
+            .addField('Online Players', response.onlinePlayers)
+            .addField('Max Players', response.maxPlayers);
+
+        message.channel.send(Embed);
+    })
 }
 
 bot.login(token);
