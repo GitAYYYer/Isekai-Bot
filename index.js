@@ -555,15 +555,15 @@ function adventureStart(message, adventureArgument) {
       store adventure id, finish time and adventure data id
       
        */
+    const authorId = message.author.id;
 
     //check if the adventure the player is embarking on exists
     if (isNull(adventureArgument) || !getJsonData(adventureDataPath).hasOwnProperty(adventureArgument)) {
-        message.channel.send("Please enter a valid adventure ID.");
+        message.channel.send(`Please enter a valid ID, ${mentionUser(authorId)}`)
         return;
     }
 
-    const authorId = message.author.id;
-    let partyId = getJsonData(saveDataPath)[authorId]["partyId"];
+    let partyId = getJsonData(saveDataPath)[authorId]['partyId'];
     let playerParty = getJsonData(playerPartiesPath);
 
     if (!isNull(partyId)) {
@@ -571,7 +571,7 @@ function adventureStart(message, adventureArgument) {
         let partyAdventureId;
 
         try {
-            partyAdventureId = playerParty[partyId]["adventureId"];
+            partyAdventureId = playerParty[partyId]['adventureId'];
         } catch (err) {}
 
         if (isNull(partyAdventureId)) {
@@ -582,19 +582,13 @@ function adventureStart(message, adventureArgument) {
             //write new adventure into playerAdventures
             writeJson(playerAdventuresPath,createNewAdventure(newAdventureId,adventureArgument,parseInt(adventureDuration) + Date.now()));
 
-            message.channel.send(
-                "Started a new adventure for " +
-                mentionUser(authorId) +
-                " on adventure id: " +
-                newAdventureId +
-                "!"
-            );
+            message.channel.send(`Started a new adventure for ${mentionUser(authorId)}, on adventure ID: ${newAdventureId}!`);
 
             //Overwrite adventure id in party id
-            playerParty[partyId]["adventureId"] = newAdventureId;
+            playerParty[partyId]['adventureId'] = newAdventureId;
             writeJson(playerPartiesPath, playerParty);
         } else {
-            message.channel.send("Already on an adventure, id: " + partyAdventureId);
+            message.channel.send(`Already on an adventure, ID: ${partyAdventureId}.`);
         }
     } else {
         message.channel.send("Join a party first");
@@ -612,17 +606,12 @@ function adventureComplete(message) {
         //check if they're on an adventure
         if (!isNull(adventureId)) {
             let adventure = getJsonData(playerAdventuresPath);
-            var completionTime = getJsonData(playerAdventuresPath)[adventureId][
-                "completion"
-            ];
+            var completionTime = getJsonData(playerAdventuresPath)[adventureId]["completion"];
 
             //if date is past set completion date
             if (Date.now() < completionTime) {
                 let remainingTime = humanizeDuration(completionTime - Date.now());
-                message.channel.send(
-                    "You haven't completed your adventure yet. Complete in: " +
-                    remainingTime
-                );
+                message.channel.send(`You haven't completed your adventure yet. Complete in: ${remainingTime}.`);
             } else {
                 message.channel.send("Completed.");
 
@@ -635,10 +624,10 @@ function adventureComplete(message) {
                 writeJson(playerAdventuresPath, adventure);
             }
         } else {
-            message.channel.send("You're not on an adventure.");
+            message.channel.send(`You're not on an adventure, ${mentionUser(message.author.id)}.`);
         }
     } else {
-        message.channel.send("You're not even in a party.");
+        message.channel.send(`You're not in a party, ${mentionUser(message.author.id)}.`);
     }
 }
 
@@ -796,9 +785,7 @@ function shopBuy(message, itemName) {
         writeJson(saveDataPath, players);
     } else {
         message.channel.send(`${playerName}'s Wallet: $${player.money}`);
-        message.channel.send(
-            `Sorry you don't have enough money to buy a ${item.name}. :(`
-        );
+        message.channel.send(`Sorry you don't have enough money to buy a ${item.name}. :(`);
     }
 }
 
