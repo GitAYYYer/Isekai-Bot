@@ -14,7 +14,7 @@
       "agl": 10,
       "int": 10
     },
-    "currentClass": null,
+    "currentClass": "unclassed",
     "classes": [{}],
     "money": 495555,
     "partyId": 6936,
@@ -39,7 +39,7 @@
       "agl": 10,
       "int": 10
     },
-    "currentClass": null,
+    "currentClass": "unclassed",
     "classes": [{}],
     "money": 11,
     "partyId": 6936,
@@ -64,7 +64,7 @@
       "agl": 10,
       "int": 10
     },
-    "currentClass": null,
+    "currentClass": "unclassed",
     "classes": [{}],
     "money": 9835,
     "partyId": 0,

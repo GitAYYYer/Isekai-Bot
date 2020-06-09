@@ -117,18 +117,21 @@ function createNewPlayer(authorId) {
         level: 0,
         currentXP: 0,
         xpToNextLevel: 100,
-        stats: {
+        combatStats: {
             pAtk: 10,
             mAtk: 10,
             pDef: 10,
             mDef: 10,
             currentHP: 100,
             maxHP: 100,
+        },
+        rawStats: {
             str: 10,
             agl: 10,
-            int: 10
+            int: 10,
+            vit: 10
         },
-        currentClass: null,
+        currentClass: unclassed,
         classes: [{}],
         money: 0,
         partyId: null,
