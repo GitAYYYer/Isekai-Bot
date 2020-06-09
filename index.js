@@ -5,6 +5,8 @@ const bot = new Discord.Client();
 // regular imports
 const humanizeDuration = require("humanize-duration");
 const ping = require("minecraft-server-util");
+const Danbooru = require('danbooru');
+
 
 //js files
 const adventureController = require("./scripts/adventure.js");
@@ -105,6 +107,11 @@ bot.on("message", (message) => {
 
         case "e2e":
             mc(message);
+            break;
+
+        case "anime":
+            danbooru(message);
+            break;
     }
 });
 
@@ -322,6 +329,21 @@ function mc(message) {
             .addField('Max Players', response.maxPlayers);
 
         message.channel.send(Embed);
+    })
+}
+
+function danbooru(message) {
+// Perform a search for popular image posts
+    const booru = new Danbooru();
+    booru.posts({tags: 'rating:safe order:rank'}).then(posts => {
+        // Select a random post from posts array
+        const index = Math.floor(Math.random() * posts.length);
+        const post = posts[index];
+
+        // Get post's url and create a filename for it
+        const url = booru.url(post.file_url);
+        //const name = `${post.md5}.${post.file_ext}`;
+        message.channel.send( {files: [url.href]});
     })
 }
 

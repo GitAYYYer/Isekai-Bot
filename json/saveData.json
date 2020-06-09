@@ -100,5 +100,39 @@
         "quantity": 6
       }
     ]
+  },
+  "231700435071664128": {
+    "level": 0,
+    "currentXP": 0,
+    "xpToNextLevel": 100,
+    "stats": {
+      "atk": 10,
+      "def": 10,
+      "hp": 10
+    },
+    "currentClass": null,
+    "classes": [
+      {}
+    ],
+    "money": 0,
+    "partyId": null,
+    "inventory": []
+  },
+  "234541539190243328": {
+    "level": 0,
+    "currentXP": 0,
+    "xpToNextLevel": 100,
+    "stats": {
+      "atk": 10,
+      "def": 10,
+      "hp": 10
+    },
+    "currentClass": null,
+    "classes": [
+      {}
+    ],
+    "money": 0,
+    "partyId": null,
+    "inventory": []
   }
 }
