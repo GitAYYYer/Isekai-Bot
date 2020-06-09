@@ -124,24 +124,47 @@ function createNewPlayer(authorId) {
         level: 0,
         currentXP: 0,
         xpToNextLevel: 100,
-        stats: {
+        combatStats: {
             pAtk: 10,
             mAtk: 10,
             pDef: 10,
             mDef: 10,
             currentHP: 100,
             maxHP: 100,
-            str: 10,
-            agl: 10,
-            int: 10
         },
-        currentClass: null,
+        rawStats: {
+            str: 10,
+            agi: 10,
+            int: 10,
+            vit: 10
+        },
+        currentClass: unclassed,
         classes: [{}],
         money: 0,
         partyId: null,
         inventory: [],
     };
     return currentSaveData;
+}
+
+/*
+Called when a player levels up. Look at the classes.json, get their class, 
+and increase their raw stats by the multipliers.
+*/
+function increaseStats(currentSaveData, authorId) {
+    const classes = utils.getJsonData(utils.classesPath);
+    let playerClass = currentSaveData[authorId]['currentClass'];
+    let str = currentSaveData[authorId]['rawStats']['str'];
+    let agi = currentSaveData[authorId]['rawStats']['agi'];
+    let int = currentSaveData[authorId]['rawStats']['int'];
+    let vit = currentSaveData[authorId]['rawStats']['vit'];
+
+    // Make the current stat equal to itself multiplied by the multiplier. 
+    // outermost parseFloat is because the .toFixed(2) method keeps 2 decimal places, but returns as a string.
+    currentSaveData[authorId]['rawStats']['str'] = parseFloat(  (parseFloat(str) * classes[playerClass]['rawStatsMultiplier']['str']).toFixed(2)    );
+    currentSaveData[authorId]['rawStats']['agi'] = parseFloat(  (parseFloat(agi) * classes[playerClass]['rawStatsMultiplier']['agi']).toFixed(2)    );
+    currentSaveData[authorId]['rawStats']['int'] = parseFloat(  (parseFloat(int) * classes[playerClass]['rawStatsMultiplier']['int']).toFixed(2)    );
+    currentSaveData[authorId]['rawStats']['vit'] = parseFloat(  (parseFloat(vit) * classes[playerClass]['rawStatsMultiplier']['vit']).toFixed(2)    );
 }
 
 /*
@@ -190,6 +213,7 @@ function checkLevelUpAndChangeXP(message, currentSaveData, xpGain) {
         currentSaveData[authorId]["level"] = currentLevel + 1;
         currentSaveData[authorId]["currentXP"] = leftoverXP;
         currentSaveData[authorId]["xpToNextLevel"] = xpToNextLevel * xpToNextLevelMultiplier;
+        increaseStats(currentSaveData, authorId);
 
         // This case means just change the currentXP value.
     } else {
@@ -225,7 +249,7 @@ function train(message) {
         // The maximum xp gain is 10% of your xp needed to level up.
         let maxXpGain = parseInt(currentSaveData[authorId]["xpToNextLevel"]) * 0.1;
 
-        let xpGain = utils.getRandomInt(minXpGain, maxXpGain);
+        let xpGain = utils.getRandomInt(1000, 2000);
         message.channel.send(`You've done your training for the day ${utils.mentionUser(authorId)}! You've gained ${xpGain}XP.`);
         checkLevelUpAndChangeXP(message, currentSaveData, xpGain);
 

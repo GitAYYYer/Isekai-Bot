@@ -1,24 +1,27 @@
 {
   "175880304525836288": {
     "level": 1,
-    "currentXP": 8,
+    "currentXP": 0,
     "xpToNextLevel": 100,
-    "stats": {
+    "combatStats": {
       "pAtk": 10,
       "mAtk": 10,
       "pDef": 10,
       "mDef": 10,
       "currentHP": 100,
-      "maxHP": 100,
-      "str": 10,
-      "agl": 10,
-      "int": 10
+      "maxHP": 100
     },
-    "currentClass": null,
+    "rawStats": {
+      "str": 10,
+      "agi": 10,
+      "int": 10,
+      "vit": 10
+    },
+    "currentClass": "unclassed",
     "classes": [
       {}
     ],
-    "money": 495555,
+    "money": 17,
     "partyId": 6936,
     "inventory": [
       {
@@ -32,18 +35,21 @@
     "level": 0,
     "currentXP": 0,
     "xpToNextLevel": 100,
-    "stats": {
+    "combatStats": {
       "pAtk": 10,
       "mAtk": 10,
       "pDef": 10,
       "mDef": 10,
       "currentHP": 100,
-      "maxHP": 100,
-      "str": 10,
-      "agl": 10,
-      "int": 10
+      "maxHP": 100
     },
-    "currentClass": null,
+    "rawStats": {
+      "str": 10,
+      "agi": 10,
+      "int": 10,
+      "vit": 10
+    },
+    "currentClass": "unclassed",
     "classes": [
       {}
     ],
@@ -61,18 +67,21 @@
     "level": 1,
     "currentXP": 0,
     "xpToNextLevel": 100,
-    "stats": {
+    "combatStats": {
       "pAtk": 10,
       "mAtk": 10,
       "pDef": 10,
       "mDef": 10,
       "currentHP": 100,
-      "maxHP": 100,
-      "str": 10,
-      "agl": 10,
-      "int": 10
+      "maxHP": 100
     },
-    "currentClass": null,
+    "rawStats": {
+      "str": 10,
+      "agi": 10,
+      "int": 10,
+      "vit": 10
+    },
+    "currentClass": "unclassed",
     "classes": [
       {}
     ],
@@ -100,39 +109,5 @@
         "quantity": 6
       }
     ]
-  },
-  "231700435071664128": {
-    "level": 0,
-    "currentXP": 0,
-    "xpToNextLevel": 100,
-    "stats": {
-      "atk": 10,
-      "def": 10,
-      "hp": 10
-    },
-    "currentClass": null,
-    "classes": [
-      {}
-    ],
-    "money": 0,
-    "partyId": null,
-    "inventory": []
-  },
-  "234541539190243328": {
-    "level": 0,
-    "currentXP": 0,
-    "xpToNextLevel": 100,
-    "stats": {
-      "atk": 10,
-      "def": 10,
-      "hp": 10
-    },
-    "currentClass": null,
-    "classes": [
-      {}
-    ],
-    "money": 0,
-    "partyId": null,
-    "inventory": []
   }
 }
