@@ -8,6 +8,7 @@ const playerAdventuresPath = jsonFolder + "/playerAdventures.json";
 const playerPartiesPath = jsonFolder + "/playerParties.json";
 const cooldownsPath = jsonFolder + "/cooldowns.json";
 const shopPath = jsonFolder + "/shop.json";
+const classesPath = jsonFolder + "/classes.json";
 
 
 function checkSaveExists(message) {
@@ -89,4 +90,5 @@ function display(message) {
     );
 }
 
-module.exports = {checkSaveExists, getUserFromMention, display, getJsonData, getRandomInt, isNull, mentionUser, up, writeJson, jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath};
+module.exports = {checkSaveExists, getUserFromMention, display, getJsonData, getRandomInt, isNull, mentionUser, up, writeJson, 
+    jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath, classesPath};
