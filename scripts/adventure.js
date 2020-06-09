@@ -57,6 +57,11 @@ function adventureStart(message, adventureArgument) {
         } catch (err) {}
 
         if (utils.isNull(partyAdventureId)) {
+
+            if (playerParty[partyId]["leader"] != authorId) {
+                message.channel.send(`Only the party leader ${utils.mentionUser(playerParty[partyId]["leader"])} can begin the adventure.`);
+                return;
+            }
             //get adventure data (can move into createNewAdventure())
             let adventureDuration = utils.getJsonData(utils.adventureDataPath)[adventureArgument]['duration'];
             let newAdventureId = utils.getRandomInt(1, 1000);
@@ -64,7 +69,12 @@ function adventureStart(message, adventureArgument) {
             //write new adventure into playerAdventures
             utils.writeJson(utils.playerAdventuresPath,createNewAdventure(newAdventureId,adventureArgument,parseInt(adventureDuration) + Date.now()));
 
-            message.channel.send(`Started a new adventure for ${utils.mentionUser(authorId)}, on adventure ID: ${newAdventureId}!`);
+            let membersString = "";
+            for (let i = 0; i < playerParty[partyId]["members"].length; i++) {
+                membersString += utils.mentionUser(playerParty[partyId]["members"][i]) + ", ";
+            }
+            membersString = membersString.substring(0, membersString.length - 2);
+            message.channel.send(`Started a new adventure for ${membersString} on adventure ID: ${newAdventureId}!`);
 
             //Overwrite adventure id in party id
             playerParty[partyId]['adventureId'] = newAdventureId;
