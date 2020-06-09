@@ -15,14 +15,18 @@
       "int": 10
     },
     "currentClass": null,
-    "classes": [{}],
+    "classes": [
+      {}
+    ],
     "money": 495555,
     "partyId": 6936,
-    "inventory": [{
-      "name": "Sword",
-      "cost": 10,
-      "quantity": 3
-    }]
+    "inventory": [
+      {
+        "name": "Sword",
+        "cost": 10,
+        "quantity": 3
+      }
+    ]
   },
   "187817424337240064": {
     "level": 0,
@@ -40,14 +44,18 @@
       "int": 10
     },
     "currentClass": null,
-    "classes": [{}],
+    "classes": [
+      {}
+    ],
     "money": 11,
     "partyId": 6936,
-    "inventory": [{
-      "name": "Sword",
-      "cost": 10,
-      "quantity": 2
-    }]
+    "inventory": [
+      {
+        "name": "Sword",
+        "cost": 10,
+        "quantity": 2
+      }
+    ]
   },
   "212926098680446976": {
     "level": 1,
@@ -65,10 +73,13 @@
       "int": 10
     },
     "currentClass": null,
-    "classes": [{}],
+    "classes": [
+      {}
+    ],
     "money": 9835,
     "partyId": 0,
-    "inventory": [{
+    "inventory": [
+      {
         "name": "Sword",
         "cost": 10,
         "quantity": 2
