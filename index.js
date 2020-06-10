@@ -15,13 +15,6 @@ const shopController = require("./scripts/shop.js");
 const classesController = require("./scripts/classes.js");
 const utils = require("./scripts/isekaiUtils.js");
 
-// config
-const configFile = require(utils.jsonFolder + "/config.json");
-
-// config files
-const token = configFile.token;
-const prefix = configFile.prefix;
-
 // constant variables
 const xpToNextLevelMultiplier = 1.5;
 
@@ -31,11 +24,11 @@ bot.on("ready", () => {
 
 bot.on("message", (message) => {
     noPrefixListener(message);
-    if (!message.content.startsWith(prefix)) return;
+    if (!message.content.startsWith(utils.prefix)) return;
 
-    let args = message.content.slice(prefix.length).split(" ");
+    let args = message.content.slice(utils.prefix.length).split(" ");
     if (!utils.checkSaveExists(message) && args[0].toLowerCase() != "create") {
-        message.channel.send(`Sorry you don't have save data ${utils.mentionUser(message.author.id)}. Try doing ${prefix}create to make a new character.`);
+        message.channel.send(`Sorry you don't have save data ${utils.mentionUser(message.author.id)}. Try doing ${utils.prefix}create to make a new character.`);
         return;
     }
     switch (args[0].toLowerCase()) {
@@ -78,7 +71,7 @@ bot.on("message", (message) => {
             break;
 
         case "prefix":
-            message.channel.send("current prefix is: " + prefix);
+            message.channel.send("current prefix is: " + utils.prefix);
             break;
 
         case "adventure":
@@ -376,4 +369,4 @@ function danbooru(message) {
     })
 }
 
-bot.login(token);
+bot.login(utils.token);

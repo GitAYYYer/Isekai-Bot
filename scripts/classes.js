@@ -11,7 +11,7 @@ const classesSwitch = (message, args) => {
             break;
 
         default:
-            message.channel.send(`Looks like you're missing an extra argument, ${utils.mentionUser(message.author.id)}. Try typing (need utils.prefix)class help for more info.`);
+            message.channel.send(`Looks like you're missing an extra argument, ${utils.mentionUser(message.author.id)}. Try typing ${utils.prefix}class help for more info.`);
             break;
     }
 }
