@@ -176,6 +176,12 @@ function partyInvite(message, targetPlayer) {
     let currentSaveData = utils.getJsonData(utils.saveDataPath);
     let invitersPartyId = currentSaveData[authorId]['partyId'];
 
+    // Check if the inviter (author) is the leader of their party (compare leader id to the author id).
+    if (utils.getJsonData(utils.playerPartiesPath)[invitersPartyId]['leader'] != authorId) {
+        message.channel.send(`You cannot invite someone to your party ${utils.mentionUser(authorId)}, since you aren't the leader.`);
+        return;
+    }
+
     // Check if inviter is actually in a party
     if (utils.isNull(invitersPartyId)) {
         message.channel.send(`${utils.mentionUser(authorId)} is not currently in a party. Join one first before using ${prefix}invite`);
