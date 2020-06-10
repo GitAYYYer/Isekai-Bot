@@ -12,6 +12,7 @@ const Danbooru = require('danbooru');
 const adventureController = require("./scripts/adventure.js");
 const partyController = require("./scripts/party.js");
 const shopController = require("./scripts/shop.js");
+const classesController = require("./scripts/classes.js");
 const utils = require("./scripts/isekaiUtils.js");
 
 // config
@@ -94,6 +95,10 @@ bot.on("message", (message) => {
 
         case "buy":
             shopController.shopBuy(message, args[1]);
+            break;
+
+        case "class":
+            classesController.classesSwitch(message, args);
             break;
 
         case "balance":

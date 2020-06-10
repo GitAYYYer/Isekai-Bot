@@ -17,7 +17,7 @@
       "int": 10,
       "vit": 10
     },
-    "currentClass": "unclassed",
+    "currentClass": "warrior",
     "classes": [
       {}
     ],
@@ -81,7 +81,7 @@
       "int": 10,
       "vit": 10
     },
-    "currentClass": "unclassed",
+    "currentClass": "mage",
     "classes": [
       {}
     ],
