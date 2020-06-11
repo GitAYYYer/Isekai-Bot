@@ -121,12 +121,12 @@ function partyJoin(message, targetPlayer) {
     //see if the party is full
     //make it the new message author party id
     //add the member to the party[members]
+    const authorId = message.author.id;
 
     if (utils.isNull(targetPlayer)) {
-        message.channel.send("Please enter the target player.");
+        message.channel.send(`'${targetPlayer}' is not a valid player. Please enter an existing player.`);
         return;
     }
-
 
     let playerSave = utils.getJsonData(utils.saveDataPath);
 
@@ -136,10 +136,10 @@ function partyJoin(message, targetPlayer) {
         return;
     }
 
-    let playerSavePartyId = playerSave[message.author.id]['partyId'];
+    let playerSavePartyId = playerSave[authorId]['partyId'];
 
     if (!utils.isNull(playerSavePartyId)) {
-        message.channel.send(`You're already in a party, ${utils.mentionUser(message.author.id)}. Please leave your current one first.`);
+        message.channel.send(`You're already in a party, ${utils.mentionUser(authorId)}. Please leave your current one first.`);
         return;
     }
 
@@ -151,14 +151,33 @@ function partyJoin(message, targetPlayer) {
     }
 
     let party = utils.getJsonData(utils.playerPartiesPath);
-    party[targetSavePartyId]['members'].push(message.author.id);
+    let partyLeader = party[targetSavePartyId]['leader'];
+    message.channel.send(`${utils.mentionUser(authorId)} wants to join your party, ${utils.mentionUser(partyLeader)}. You can accept or decline.`)
 
-    playerSave[message.author.id]['partyId'] = targetSavePartyId;
+    // Check party leader response for accept or decline.
+    const collector = new Discord.MessageCollector(message.channel, m => m.author.id === partyLeader, {
+        time: 10000
+    });
+    collector.on('collect', replyMessage => {
+        if (replyMessage.content.toLowerCase() == 'accept') {
+            replyMessage.channel.send(`${utils.mentionUser(partyLeader)} has accepted ${utils.mentionUser(authorId)} into the party.`);
 
-    utils.writeJson(utils.saveDataPath, playerSave);
-    utils.writeJson(utils.playerPartiesPath, party);
+            party[playerSavePartyId]['members'].push(authorId);
+            playerSave[authorId]['partyId'] = targetSavePartyId;
 
-    message.channel.send("Joined party.");
+            utils.writeJson(utils.saveDataPath, playerSave);
+            utils.writeJson(utils.playerPartiesPath, party);
+            collector.stop('accepted');
+        } else if (replyMessage.content.toLowerCase() == 'decline') {
+            replyMessage.channel.send(`${utils.mentionUser(partyLeader)} has declined your request to join, ${utils.mentionUser(authorId)}.`);
+            collector.stop('declined');
+        }
+    });
+    // Can use either collected.has('accepted')/collected.has('declined'), or reason === 'accepted'/reason === 'declined'
+    collector.on('end', (collected, reason) => {
+        if (reason !== 'accepted' && reason !== 'declined')
+            message.channel.send(`${utils.mentionUser(partyLeader)} did not respond to ${utils.mentionUser(authorId)}'s request to join.`);
+    })
 }
 
 /*
@@ -201,7 +220,7 @@ function partyInvite(message, targetPlayer) {
         return;
     }
 
-    message.channel.send(`${utils.mentionUser(authorId)} has invited ${utils.mentionUser(targetPlayer)} to their party.`);
+    message.channel.send(`${utils.mentionUser(authorId)} has invited ${utils.mentionUser(targetPlayer)} to their party. ${utils.mentionUser(targetPlayer)} can accept or decline.`);
 
     // Passed all checks, now wait for response from targetPlayer to accept invite.
     const collector = new Discord.MessageCollector(message.channel, m => m.author.id === targetPlayer, {
@@ -221,8 +240,6 @@ function partyInvite(message, targetPlayer) {
         } else if (replyMessage.content.toLowerCase() == 'decline') {
             replyMessage.channel.send(`${utils.mentionUser(targetPlayer)} has declined ${utils.mentionUser(authorId)}'s invite.`);
             collector.stop('declined');
-        } else {
-            replyMessage.channel.send(`Please type 'accept' or 'decline', ${utils.mentionUser(targetPlayer)}.`);
         }
     });
     // Can use either collected.has('accepted')/collected.has('declined'), or reason === 'accepted'/reason === 'declined'
