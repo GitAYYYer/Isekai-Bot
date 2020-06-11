@@ -17,12 +17,12 @@
       "int": 10,
       "vit": 10
     },
-    "currentClass": "unclassed",
+    "currentClass": "warrior",
     "classes": [
       {}
     ],
     "money": 17,
-    "partyId": 6936,
+    "partyId": 6940,
     "inventory": [
       {
         "name": "Sword",
@@ -54,7 +54,7 @@
       {}
     ],
     "money": 11,
-    "partyId": 6936,
+    "partyId": 9322,
     "inventory": [
       {
         "name": "Sword",
@@ -81,12 +81,12 @@
       "int": 10,
       "vit": 10
     },
-    "currentClass": "unclassed",
+    "currentClass": "mage",
     "classes": [
       {}
     ],
     "money": 9835,
-    "partyId": 0,
+    "partyId": 9322,
     "inventory": [
       {
         "name": "Sword",
