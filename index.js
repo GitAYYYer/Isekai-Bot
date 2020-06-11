@@ -63,7 +63,7 @@ bot.on("message", (message) => {
         case "ratemywaifu":
             switch (args[1].toLowerCase()) {
                 case "endorsi":
-                    message.channel.send("widePeepoHappy");
+                    message.channel.send("<:ayaya:720228188055273473>");
                     break;
                 default:
                     message.channel.send("garbo");
