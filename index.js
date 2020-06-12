@@ -247,7 +247,7 @@ function train(message) {
         // The maximum xp gain is 10% of your xp needed to level up.
         let maxXpGain = parseInt(currentSaveData[authorId]["xpToNextLevel"]) * 0.1;
 
-        let xpGain = utils.getRandomInt(1000, 2000);
+        let xpGain = utils.getRandomInt(minXpGain, maxXpGain);
         message.channel.send(`You've done your training for the day ${utils.mentionUser(authorId)}! You've gained ${xpGain}XP.`);
         checkLevelUpAndChangeXP(message, currentSaveData, xpGain);
 
@@ -329,14 +329,18 @@ function inventory(message) {
 }
 
 function noPrefixListener(message) {
+    if (message.author.id == '472141928578940958') {
+        message.channel.send('<:ayaya:720228188055273473>');
+    }
     switch (message.content.toLowerCase()) {
         case "garbo":
         case "who":
         case "???":
             message.channel.send("WH <:OMEGALUL:719390337323237410>");
+            break;
         case "no":
             message.channel.send("N <:OMEGALUL:719390337323237410>");
-
+            break;
     }
 }
 
