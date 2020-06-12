@@ -103,8 +103,8 @@ bot.on("message", (message) => {
             inventory(message);
             break;
 
-        case "e2e":
-            mc(message);
+        case "mc":
+            mc(args[1], message);
             break;
 
         case "anime":
@@ -159,10 +159,10 @@ function increaseStats(currentSaveData, authorId) {
 
     // Make the current stat equal to itself multiplied by the multiplier. 
     // outermost parseFloat is because the .toFixed(2) method keeps 2 decimal places, but returns as a string.
-    currentSaveData[authorId]['rawStats']['str'] = parseFloat(  (parseFloat(str) * classes[playerClass]['rawStatsMultiplier']['str']).toFixed(2)    );
-    currentSaveData[authorId]['rawStats']['agi'] = parseFloat(  (parseFloat(agi) * classes[playerClass]['rawStatsMultiplier']['agi']).toFixed(2)    );
-    currentSaveData[authorId]['rawStats']['int'] = parseFloat(  (parseFloat(int) * classes[playerClass]['rawStatsMultiplier']['int']).toFixed(2)    );
-    currentSaveData[authorId]['rawStats']['vit'] = parseFloat(  (parseFloat(vit) * classes[playerClass]['rawStatsMultiplier']['vit']).toFixed(2)    );
+    currentSaveData[authorId]['rawStats']['str'] = parseFloat((parseFloat(str) * classes[playerClass]['rawStatsMultiplier']['str']).toFixed(2));
+    currentSaveData[authorId]['rawStats']['agi'] = parseFloat((parseFloat(agi) * classes[playerClass]['rawStatsMultiplier']['agi']).toFixed(2));
+    currentSaveData[authorId]['rawStats']['int'] = parseFloat((parseFloat(int) * classes[playerClass]['rawStatsMultiplier']['int']).toFixed(2));
+    currentSaveData[authorId]['rawStats']['vit'] = parseFloat((parseFloat(vit) * classes[playerClass]['rawStatsMultiplier']['vit']).toFixed(2));
 }
 
 /*
@@ -334,21 +334,30 @@ function noPrefixListener(message) {
         case "who":
         case "???":
             message.channel.send("WH <:OMEGALUL:719390337323237410>");
+        case "no":
+            message.channel.send("N <:OMEGALUL:719390337323237410>");
+
     }
 }
 
-function mc(message) {
-    ping("122.111.176.250", 25565, (error, response) => {
+function mc(server, message) {
+    let port = 25565;
+    switch (server.toLowerCase()) {
+        case "omni":
+            port = 25566;
+    }
+
+    ping("122.111.176.250", port, (error, response) => {
         if (error) {
             message.channel.send("Server ping timed out.");
             throw error;
         }
+
         const Embed = new Discord.MessageEmbed()
             .setTitle('Server Status')
             .addField('Server IP', response.host)
             .addField('Server Version', response.version)
-            .addField('Online Players', response.onlinePlayers)
-            .addField('Max Players', response.maxPlayers);
+            .addField('Online Players', response.onlinePlayers);
 
         message.channel.send(Embed);
     })
@@ -365,7 +374,7 @@ function danbooru(message) {
         // Get post's url and create a filename for it
         const url = booru.url(post.file_url);
         //const name = `${post.md5}.${post.file_ext}`;
-        message.channel.send( {files: [url.href]});
+        message.channel.send({files: [url.href]});
     })
 }
 
