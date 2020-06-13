@@ -94,6 +94,10 @@ bot.on("message", (message) => {
             classesController.classesSwitch(message, args);
             break;
 
+        case "combat":
+            ducDebugCombat(message);
+            break;
+
         case "balance":
             balance(message);
             break;
@@ -109,6 +113,10 @@ bot.on("message", (message) => {
 
         case "anime":
             danbooru(message);
+            break;
+
+        default:
+            message.channel.send("Did not recognise command.");
             break;
     }
 });
@@ -326,6 +334,54 @@ function inventory(message) {
     } else {
         message.channel.send(`${inventoryList}`);
     }
+}
+
+function ducDebugCombat(message) {
+    console.log('start');
+    const authorId = message.author.id;
+    console.log('after author');
+    const currentSaveData = utils.getJsonData(utils.saveDataPath);
+    const party = utils.getJsonData(utils.playerPartiesPath);
+    const partyMembers = party[currentSaveData[authorId]['partyId']]['members'];
+    console.log('after declaring');
+
+    let memberTurns = {};
+    for (var memberId of partyMembers) {
+        memberTurns[memberId] = {turnTaken: false, command: null};
+    }
+    console.log('after loop');
+
+
+    let playerInputs = true;
+    // Accept messages from anyone in the channel, since the channel can only be used by the party anyway.
+    const collector = new Discord.MessageCollector(message.channel, m => partyMembers.includes(m.author.id), {
+        time: 10000
+    });
+    message.channel.send('Starting turn based combat');
+    collector.on('collect', replyMessage => {
+        if (!replyMessage.content.toLowerCase().startsWith('.use')) {
+            console.log('message did not start with .use');
+            return;
+        }
+        message.channel.send(`${utils.mentionUser(replyMessage.author.id)} used ${replyMessage.content.split(' ')[1]}!`);
+        memberTurns[replyMessage.author.id]['turnTaken'] = true;
+
+        // Checks for all keys in memberTurns, if they are all true (if all true, if statement is true)
+        if (Object.keys(memberTurns).every(function(key) { return memberTurns[key]})) {
+            console.log("all members have taken their turn");
+            collector.stop('endTurn')
+        }
+    });
+    // Can use either collected.has('accepted')/collected.has('declined'), or reason === 'accepted'/reason === 'declined'
+    collector.on('end', (collected, reason) => {
+        if (reason == 'endTurn') {
+            message.channel.send(`The party finished their turn. Applying damage and effects...`);
+        } else {
+            message.channel.send(`Timer ran out for the party's turn. Applying damage and effects...`);
+        }
+        playerInputs = false;
+    });
+    
 }
 
 function noPrefixListener(message) {
