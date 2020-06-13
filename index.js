@@ -12,14 +12,8 @@ const Danbooru = require('danbooru');
 const adventureController = require("./scripts/adventure.js");
 const partyController = require("./scripts/party.js");
 const shopController = require("./scripts/shop.js");
+const classesController = require("./scripts/classes.js");
 const utils = require("./scripts/isekaiUtils.js");
-
-// config
-const configFile = require(utils.jsonFolder + "/config.json");
-
-// config files
-const token = configFile.token;
-const prefix = configFile.prefix;
 
 // constant variables
 const xpToNextLevelMultiplier = 1.5;
@@ -30,11 +24,11 @@ bot.on("ready", () => {
 
 bot.on("message", (message) => {
     noPrefixListener(message);
-    if (!message.content.startsWith(prefix)) return;
+    if (!message.content.startsWith(utils.prefix)) return;
 
-    let args = message.content.slice(prefix.length).split(" ");
+    let args = message.content.slice(utils.prefix.length).split(" ");
     if (!utils.checkSaveExists(message) && args[0].toLowerCase() != "create") {
-        message.channel.send(`Sorry you don't have save data ${utils.mentionUser(message.author.id)}. Try doing ${prefix}create to make a new character.`);
+        message.channel.send(`Sorry you don't have save data ${utils.mentionUser(message.author.id)}. Try doing ${utils.prefix}create to make a new character.`);
         return;
     }
     switch (args[0].toLowerCase()) {
@@ -69,7 +63,7 @@ bot.on("message", (message) => {
         case "ratemywaifu":
             switch (args[1].toLowerCase()) {
                 case "endorsi":
-                    message.channel.send("widePeepoHappy");
+                    message.channel.send("<:ayaya:720228188055273473>");
                     break;
                 default:
                     message.channel.send("garbo");
@@ -77,7 +71,7 @@ bot.on("message", (message) => {
             break;
 
         case "prefix":
-            message.channel.send("current prefix is: " + prefix);
+            message.channel.send("current prefix is: " + utils.prefix);
             break;
 
         case "adventure":
@@ -96,6 +90,10 @@ bot.on("message", (message) => {
             shopController.shopBuy(message, args[1]);
             break;
 
+        case "class":
+            classesController.classesSwitch(message, args);
+            break;
+
         case "balance":
             balance(message);
             break;
@@ -105,8 +103,8 @@ bot.on("message", (message) => {
             inventory(message);
             break;
 
-        case "e2e":
-            mc(message);
+        case "mc":
+            mc(args[1], message);
             break;
 
         case "anime":
@@ -124,24 +122,47 @@ function createNewPlayer(authorId) {
         level: 0,
         currentXP: 0,
         xpToNextLevel: 100,
-        stats: {
+        combatStats: {
             pAtk: 10,
             mAtk: 10,
             pDef: 10,
             mDef: 10,
             currentHP: 100,
             maxHP: 100,
-            str: 10,
-            agl: 10,
-            int: 10
         },
-        currentClass: null,
+        rawStats: {
+            str: 10,
+            agi: 10,
+            int: 10,
+            vit: 10
+        },
+        currentClass: unclassed,
         classes: [{}],
         money: 0,
         partyId: null,
         inventory: [],
     };
     return currentSaveData;
+}
+
+/*
+Called when a player levels up. Look at the classes.json, get their class, 
+and increase their raw stats by the multipliers.
+*/
+function increaseStats(currentSaveData, authorId) {
+    const classes = utils.getJsonData(utils.classesPath);
+    let playerClass = currentSaveData[authorId]['currentClass'];
+    let str = currentSaveData[authorId]['rawStats']['str'];
+    let agi = currentSaveData[authorId]['rawStats']['agi'];
+    let int = currentSaveData[authorId]['rawStats']['int'];
+    let vit = currentSaveData[authorId]['rawStats']['vit'];
+
+    // Make the current stat equal to itself multiplied by the multiplier. 
+    // outermost parseFloat is because the .toFixed(2) method keeps 2 decimal places, but returns as a string.
+    currentSaveData[authorId]['rawStats']['str'] = parseFloat((parseFloat(str) * classes[playerClass]['rawStatsMultiplier']['str']).toFixed(2));
+    currentSaveData[authorId]['rawStats']['agi'] = parseFloat((parseFloat(agi) * classes[playerClass]['rawStatsMultiplier']['agi']).toFixed(2));
+    currentSaveData[authorId]['rawStats']['int'] = parseFloat((parseFloat(int) * classes[playerClass]['rawStatsMultiplier']['int']).toFixed(2));
+    currentSaveData[authorId]['rawStats']['vit'] = parseFloat((parseFloat(vit) * classes[playerClass]['rawStatsMultiplier']['vit']).toFixed(2));
 }
 
 /*
@@ -190,6 +211,7 @@ function checkLevelUpAndChangeXP(message, currentSaveData, xpGain) {
         currentSaveData[authorId]["level"] = currentLevel + 1;
         currentSaveData[authorId]["currentXP"] = leftoverXP;
         currentSaveData[authorId]["xpToNextLevel"] = xpToNextLevel * xpToNextLevelMultiplier;
+        increaseStats(currentSaveData, authorId);
 
         // This case means just change the currentXP value.
     } else {
@@ -307,26 +329,39 @@ function inventory(message) {
 }
 
 function noPrefixListener(message) {
+    if (message.author.id == '472141928578940958') {
+        message.channel.send('<:ayaya:720228188055273473>');
+    }
     switch (message.content.toLowerCase()) {
         case "garbo":
         case "who":
         case "???":
             message.channel.send("WH <:OMEGALUL:719390337323237410>");
+            break;
+        case "no":
+            message.channel.send("N <:OMEGALUL:719390337323237410>");
+            break;
     }
 }
 
-function mc(message) {
-    ping("122.111.176.250", 25565, (error, response) => {
+function mc(server, message) {
+    let port = 25565;
+    switch (server.toLowerCase()) {
+        case "omni":
+            port = 25566;
+    }
+
+    ping("122.111.176.250", port, (error, response) => {
         if (error) {
             message.channel.send("Server ping timed out.");
             throw error;
         }
+
         const Embed = new Discord.MessageEmbed()
             .setTitle('Server Status')
             .addField('Server IP', response.host)
             .addField('Server Version', response.version)
-            .addField('Online Players', response.onlinePlayers)
-            .addField('Max Players', response.maxPlayers);
+            .addField('Online Players', response.onlinePlayers);
 
         message.channel.send(Embed);
     })
@@ -343,8 +378,8 @@ function danbooru(message) {
         // Get post's url and create a filename for it
         const url = booru.url(post.file_url);
         //const name = `${post.md5}.${post.file_ext}`;
-        message.channel.send( {files: [url.href]});
+        message.channel.send({files: [url.href]});
     })
 }
 
-bot.login(token);
+bot.login(utils.token);

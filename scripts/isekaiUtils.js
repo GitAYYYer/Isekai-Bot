@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 // save related
-const jsonFolder = './json';
+const jsonFolder = `${__dirname}/../json`;
 const saveDataPath = jsonFolder + "/saveData.json";
 const adventureDataPath = jsonFolder + "/adventureData.json";
 const playerAdventuresPath = jsonFolder + "/playerAdventures.json";
@@ -10,7 +10,12 @@ const cooldownsPath = jsonFolder + "/cooldowns.json";
 const shopPath = jsonFolder + "/shop.json";
 const dungeonPath = jsonFolder + "/dungeon.json";
 const bossesPath = jsonFolder + "/bosses.json";
+const classesPath = jsonFolder + "/classes.json";
 
+// config
+const configFile = require(jsonFolder + "\\config.json");
+const token = configFile.token;
+const prefix = configFile.prefix;
 
 function checkSaveExists(message) {
     return getJsonData(saveDataPath).hasOwnProperty(message.author.id);
@@ -91,4 +96,5 @@ function display(message) {
     );
 }
 
-module.exports = {checkSaveExists, getUserFromMention, display, getJsonData, getRandomInt, isNull, mentionUser, up, writeJson, jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath};
+module.exports = {checkSaveExists, getUserFromMention, display, getJsonData, getRandomInt, isNull, mentionUser, up, writeJson, 
+    jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath, classesPath, token, prefix};
