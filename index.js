@@ -336,38 +336,34 @@ function inventory(message) {
     }
 }
 
-function ducDebugCombat(message) {
-    console.log('start');
+async function ducDebugCombat(message) {
     const authorId = message.author.id;
-    console.log('after author');
     const currentSaveData = utils.getJsonData(utils.saveDataPath);
     const party = utils.getJsonData(utils.playerPartiesPath);
     const partyMembers = party[currentSaveData[authorId]['partyId']]['members'];
-    console.log('after declaring');
 
     let memberTurns = {};
     for (var memberId of partyMembers) {
         memberTurns[memberId] = {turnTaken: false, command: null};
     }
-    console.log('after loop');
+    console.log(memberTurns);
 
-
-    let playerInputs = true;
     // Accept messages from anyone in the channel, since the channel can only be used by the party anyway.
-    const collector = new Discord.MessageCollector(message.channel, m => partyMembers.includes(m.author.id), {
+    const collector = new Discord.MessageCollector(message.channel, function(m) { return true; }, {
         time: 10000
     });
     message.channel.send('Starting turn based combat');
+
     collector.on('collect', replyMessage => {
         if (!replyMessage.content.toLowerCase().startsWith('.use')) {
-            console.log('message did not start with .use');
+            console.log(`message from ${replyMessage.author.username} (${replyMessage.author.id}) did not start with .use`);
             return;
         }
         message.channel.send(`${utils.mentionUser(replyMessage.author.id)} used ${replyMessage.content.split(' ')[1]}!`);
         memberTurns[replyMessage.author.id]['turnTaken'] = true;
 
         // Checks for all keys in memberTurns, if they are all true (if all true, if statement is true)
-        if (Object.keys(memberTurns).every(function(key) { return memberTurns[key]})) {
+        if (Object.keys(memberTurns).every(function(key) { return memberTurns[key]['turnTaken']})) {
             console.log("all members have taken their turn");
             collector.stop('endTurn')
         }
@@ -379,9 +375,16 @@ function ducDebugCombat(message) {
         } else {
             message.channel.send(`Timer ran out for the party's turn. Applying damage and effects...`);
         }
-        playerInputs = false;
+        // this should log each msg's contents from when collector started.
+        collected.each(function(msg) {
+            console.log(msg.content);
+        });
+        ducDebugBossTurn(message);
     });
-    
+}
+
+async function ducDebugBossTurn(message) {
+    message.channel.send("Async: This message should appear AFTER the collector finishes in debugCombat()");
 }
 
 function noPrefixListener(message) {
