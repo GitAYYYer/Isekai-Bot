@@ -1,0 +1,19 @@
+{
+    "s001": {
+    "name": "Tackle",
+    "range": "melee",
+    "targets": "single",
+    "damage": {
+        "type": "physical",
+        "scaling": {
+            "pAtk": 0.5,
+            "mAtk": 0,
+            "pDef": 0,
+            "mDef": 0,
+            "currentHP": 0,
+            "maxHP": 0
+        }
+    },
+    "limit": [1, 1]
+    }
+}

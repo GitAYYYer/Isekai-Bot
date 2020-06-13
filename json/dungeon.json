@@ -1,0 +1,8 @@
+{
+    "d001": {
+        "name": "Dungeon 1",
+        "levels": 1,
+        "levelReq": 10,
+        "bosses": ["b001"]
+    }
+}
