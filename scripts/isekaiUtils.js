@@ -8,6 +8,8 @@ const playerAdventuresPath = jsonFolder + "/playerAdventures.json";
 const playerPartiesPath = jsonFolder + "/playerParties.json";
 const cooldownsPath = jsonFolder + "/cooldowns.json";
 const shopPath = jsonFolder + "/shop.json";
+const dungeonPath = jsonFolder + "/dungeon.json";
+const bossesPath = jsonFolder + "/bosses.json";
 
 
 function checkSaveExists(message) {
