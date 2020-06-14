@@ -13,6 +13,7 @@ const adventureController = require("./scripts/adventure.js");
 const partyController = require("./scripts/party.js");
 const shopController = require("./scripts/shop.js");
 const classesController = require("./scripts/classes.js");
+const haremController = require("./scripts/harem.js");
 const dungeonController = require("./scripts/dungeon.js")
 const utils = require("./scripts/isekaiUtils.js");
 
@@ -111,7 +112,12 @@ bot.on("message", (message) => {
         case "anime":
             danbooru(message);
             break;
-        case "dungeon":
+
+        case "gacha":
+            haremController.gachaRoll(message);
+            break;
+
+      case "dungeon":
             dungeonController.dungeonSwitch(message, args);
             break;
     }
@@ -140,7 +146,7 @@ function createNewPlayer(authorId) {
             int: 10,
             vit: 10
         },
-        currentClass: unclassed,
+        currentClass: 'unclassed',
         classes: [{}],
         money: 0,
         partyId: null,
@@ -333,9 +339,6 @@ function inventory(message) {
 }
 
 function noPrefixListener(message) {
-    if (message.author.id == '472141928578940958') {
-        message.channel.send('<:ayaya:720228188055273473>');
-    }
     switch (message.content.toLowerCase()) {
         case "garbo":
         case "who":
