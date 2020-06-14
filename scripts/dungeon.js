@@ -25,7 +25,6 @@ const dungeonList = () => {
     message.channel.send()
 }
 
-// let newChannel;
 let newChannelID;
 //Dungeon level requirement is limitied by the lowest lvl in party
 const dungeonStart = async (message) => {
@@ -45,11 +44,7 @@ const dungeonStart = async (message) => {
             //Create a new text channel and wait for players to type ready in the new text channel
 
             let name = message.author.username;
-            const guildChannelManager = message.guild.channels;
-
-            // const newChannel = guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' })
-            // .then(console.log)
-            // .catch(console.error);
+        
             const newChannel = await asyncExample(message, name);
 
             // console.log("newChannel", newChannel);
@@ -66,23 +61,11 @@ const dungeonStart = async (message) => {
 }
 
 //Deletes a dungeon by id or name
-const dungeonDelete = (message) => {
-    const channels = message.guild.channels;
-    console.log("In delete method 1");
+const dungeonDelete = async (message) => {
+    const channels = message.client.channels;
 
-    let cacheObj;
-
-    for (let id in channels){
-        if (id == "cache"){
-            cacheObj = channels[id];
-            for (let obj of cacheObj){
-                if (newChannelID == obj[0]){
-                    console.log("Found match for new channel");
-                    console.log(cacheObj.delete(newChannelID));
-                }
-            }
-        }
-    }
+    const newChannel = await fetchChannel(channels, newChannelID);
+    newChannel.delete();
 }
 
 /*
@@ -90,8 +73,7 @@ Helper function to check all party members are 'ready' before starting the actua
 */
 function partyConfirmation(message, partyId, newChannel) {
     const allParties = utils.getJsonData(utils.playerPartiesPath);
-    const partyMembers = allParties[partyId]['members']
-
+    const partyMembers = allParties[partyId]['members'];
     let membersReady = {};
     for (var memberId of partyMembers) {
         membersReady[memberId] = {ready: false};
@@ -123,6 +105,7 @@ function partyConfirmation(message, partyId, newChannel) {
         if (!reason == 'All Ready') {
             message.channel.send(`The party did not ready up in time. Closing the dungeon...`);
         }
+        newChannel.delete();
     });
 }
 
@@ -131,5 +114,11 @@ const asyncExample = async (message, name) => {
     const newChannel = await guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' });
     return newChannel
 }
+
+const fetchChannel = async (channels, newChannelID) => {
+    const newChannel = await channels.fetch(newChannelID);
+    return newChannel;
+}
+
 
 module.exports = {dungeonSwitch};
