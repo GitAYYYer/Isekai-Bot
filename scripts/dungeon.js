@@ -28,7 +28,7 @@ const dungeonList = () => {
 // let newChannel;
 let newChannelID;
 //Dungeon level requirement is limitied by the lowest lvl in party
-const dungeonStart = (message) => {
+const dungeonStart = async (message) => {
     const authorId = message.author.id;
     let partyId = utils.getJsonData(utils.saveDataPath)[authorId]['partyId'];
 
@@ -46,14 +46,15 @@ const dungeonStart = (message) => {
 
             let name = message.author.username;
             const guildChannelManager = message.guild.channels;
-            const newChannel = guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' })
-            .then(console.log('then log'))
-            .catch(console.error);
 
+            // const newChannel = guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' })
+            // .then(console.log)
+            // .catch(console.error);
+            const newChannel = await asyncExample(message, name);
+
+            console.log("newChannel", newChannel);
             newChannelID = newChannel.id;
-
-            // const channel = guildChannelManager.resolve(newChannel);
-            // channel.delete();
+            console.log("newChannelID", newChannel.id);
 
 
         } else {
@@ -72,71 +73,26 @@ const dungeonDelete = (message) => {
     const channels = message.guild.channels;
     console.log("In delete method 1");
 
-    console.log("Channels", channels);
-    // console.log("Channels", channels.guildChannelManager);
+    let cacheObj;
 
-    // for (let obj in channels.cache) {
-    //     console.log(obj.name);
-    // }
-
-    for (var id in channels.cache) {
-        console.log("id in channel ", id);
-        if (id == newChannelID) {
-            channels[id].deleted = true;
-            console.log("deleted");
+    for (let id in channels){
+        if (id == "cache"){
+            cacheObj = channels[id];
+            for (let obj of cacheObj){
+                if (newChannelID == obj[0]){
+                    console.log("Found match for new channel");
+                    console.log(cacheObj.delete(newChannelID));
+                }
+            }
         }
     }
 
 }
 
-/*
-Helper function to check all party members are 'ready' before starting the actual dungeon run.
-*/
-function partyConfirmation(message, partyId, newChannel) {
-    const authorId = message.author.id;
-    // const saveData = utils.getJsonData(utils.saveDataPath);
-    const allParties = utils.getJsonData(utils.playerPartiesPath);
-    const partyMembers = allParties[partyId]['members']
-
-    let membersReady = {};
-    for (var memberId of partyMembers) {
-        membersReady[memberId] = {ready: false};
-    }
-    console.log(newChannel);
-    message.client.channels.cache.get(newChannelID).send(`Welcome to the dungeon! You have 10 seconds (debug) to type ..ready to confirm you're ready for the dungeon.`);
-
-    // Accept messages as long as they're in the channel (only the party have access to this channel).
-    const collector = new Discord.MessageCollector(newChannel, m => m.channel.id == newChannel.id, {
-        time: 10000
-    });
-    // Players can ready up and unready. When all players have readied up, immediately end the collector.
-    collector.on('collect', replyMessage => {
-        if (replyMessage.content.toLowerCase() == '..ready') {
-            newChannel.send(`${utils.mentionUser(replyMessage.author.id)} is ready.`);
-            membersReady[replyMessage.author.id]['ready'] = true;
-        } else if (replyMessage.content.toLowerCase() == '..unready') {
-            newChannel.send(`${utils.mentionUser(replyMessage.author.id)} is not ready.`);
-            membersReady[replyMessage.author.id]['ready'] = false;
-        }
-        
-        // Checks for all keys in memberTurns, if they are all true (if all true, if statement is true)
-        if (Object.keys(memberTurns).every(function(key) { return memberTurns[key]['ready']})) {
-            newChannel.send(`All party members have readied up! Starting the dungeon in 10 seconds...`);
-            collector.stop('All Ready');
-        }
-    });
-    // Collector can stop when everyone is ready, or by timeout. If reason is not 'All Ready' then close the dungeon.
-    collector.on('end', (collected, reason) => {
-        if (!reason == 'All Ready') {
-            message.channel.send(`The party did not ready up in time. Closing the dungeon...`);
-            ducDelete(message, newChannel);
-        }
-    });
-}
-
-function ducDelete(message, newChannel) {
-    console.log(`Deleting channel with id: ${newChannel.id} and name: ${newChannel.name}`);
-    message.guild.channels[newChannel.id].deleted = true;
-}
+const asyncExample = async (message, name) => {
+    const guildChannelManager = message.guild.channels;
+    const newChannel = await guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' });
+    return newChannel
+  }
 
 module.exports = {dungeonSwitch};
