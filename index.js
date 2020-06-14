@@ -339,9 +339,6 @@ function inventory(message) {
 }
 
 function noPrefixListener(message) {
-    if (message.author.id == '472141928578940958') {
-        message.channel.send('<:ayaya:720228188055273473>');
-    }
     switch (message.content.toLowerCase()) {
         case "garbo":
         case "who":
