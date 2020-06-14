@@ -86,13 +86,12 @@ const dungeonDelete = (message) => {
             }
         }
     }
-
 }
 
 const asyncExample = async (message, name) => {
     const guildChannelManager = message.guild.channels;
     const newChannel = await guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' });
     return newChannel
-  }
+}
 
 module.exports = {dungeonSwitch};
