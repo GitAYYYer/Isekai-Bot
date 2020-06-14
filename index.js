@@ -136,7 +136,7 @@ function createNewPlayer(authorId) {
             int: 10,
             vit: 10
         },
-        currentClass: unclassed,
+        currentClass: 'unclassed',
         classes: [{}],
         money: 0,
         partyId: null,

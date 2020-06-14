@@ -1,36 +1,4 @@
 {
-  "175880304525836288": {
-    "level": 6,
-    "currentXP": 166,
-    "xpToNextLevel": 757.5,
-    "combatStats": {
-      "pAtk": 10,
-      "mAtk": 10,
-      "pDef": 10,
-      "mDef": 10,
-      "currentHP": 100,
-      "maxHP": 100
-    },
-    "rawStats": {
-      "str": 24.89,
-      "agi": 24.89,
-      "int": 24.89,
-      "vit": 24.89
-    },
-    "currentClass": "warrior",
-    "classes": [
-      {}
-    ],
-    "money": 17,
-    "partyId": 4395,
-    "inventory": [
-      {
-        "name": "Sword",
-        "cost": 10,
-        "quantity": 3
-      }
-    ]
-  },
   "187817424337240064": {
     "level": 0,
     "currentXP": 0,
@@ -109,5 +77,31 @@
         "quantity": 6
       }
     ]
+  },
+  "175880304525836288": {
+    "level": 0,
+    "currentXP": 0,
+    "xpToNextLevel": 100,
+    "combatStats": {
+      "pAtk": 10,
+      "mAtk": 10,
+      "pDef": 10,
+      "mDef": 10,
+      "currentHP": 100,
+      "maxHP": 100
+    },
+    "rawStats": {
+      "str": 10,
+      "agi": 10,
+      "int": 10,
+      "vit": 10
+    },
+    "currentClass": "unclassed",
+    "classes": [
+      {}
+    ],
+    "money": 0,
+    "partyId": null,
+    "inventory": []
   }
 }
