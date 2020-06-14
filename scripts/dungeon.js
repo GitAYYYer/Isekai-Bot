@@ -33,6 +33,7 @@ const dungeonStart = (message) => {
     let partyId = utils.getJsonData(utils.saveDataPath)[authorId]['partyId'];
 
     let allParties = utils.getJsonData(utils.playerPartiesPath);
+    var newChannel;
 
     //TODO check the group of people participating in a dungeon, and then return which dungeons can be run
 
@@ -46,11 +47,11 @@ const dungeonStart = (message) => {
             let name = message.author.username;
             const guildChannelManager = message.guild.channels;
             const newChannel = guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' })
-            .then(console.log("then log"))
+            .then(console.log('then log'))
             .catch(console.error);
 
-
             newChannelID = newChannel.id;
+
             // const channel = guildChannelManager.resolve(newChannel);
             // channel.delete();
 
@@ -61,6 +62,9 @@ const dungeonStart = (message) => {
     } else {
         message.channel.send("You have to be in a party to participate in a dungeon.")
     }
+
+    // Get confirmation from all party members that they're ready.
+    partyConfirmation(message, partyId, newChannel);
 }
 
 //Deletes a dungeon by id or name
@@ -83,6 +87,56 @@ const dungeonDelete = (message) => {
         }
     }
 
+}
+
+/*
+Helper function to check all party members are 'ready' before starting the actual dungeon run.
+*/
+function partyConfirmation(message, partyId, newChannel) {
+    const authorId = message.author.id;
+    // const saveData = utils.getJsonData(utils.saveDataPath);
+    const allParties = utils.getJsonData(utils.playerPartiesPath);
+    const partyMembers = allParties[partyId]['members']
+
+    let membersReady = {};
+    for (var memberId of partyMembers) {
+        membersReady[memberId] = {ready: false};
+    }
+    console.log(newChannel);
+    message.client.channels.cache.get(newChannelID).send(`Welcome to the dungeon! You have 10 seconds (debug) to type ..ready to confirm you're ready for the dungeon.`);
+
+    // Accept messages as long as they're in the channel (only the party have access to this channel).
+    const collector = new Discord.MessageCollector(newChannel, m => m.channel.id == newChannel.id, {
+        time: 10000
+    });
+    // Players can ready up and unready. When all players have readied up, immediately end the collector.
+    collector.on('collect', replyMessage => {
+        if (replyMessage.content.toLowerCase() == '..ready') {
+            newChannel.send(`${utils.mentionUser(replyMessage.author.id)} is ready.`);
+            membersReady[replyMessage.author.id]['ready'] = true;
+        } else if (replyMessage.content.toLowerCase() == '..unready') {
+            newChannel.send(`${utils.mentionUser(replyMessage.author.id)} is not ready.`);
+            membersReady[replyMessage.author.id]['ready'] = false;
+        }
+        
+        // Checks for all keys in memberTurns, if they are all true (if all true, if statement is true)
+        if (Object.keys(memberTurns).every(function(key) { return memberTurns[key]['ready']})) {
+            newChannel.send(`All party members have readied up! Starting the dungeon in 10 seconds...`);
+            collector.stop('All Ready');
+        }
+    });
+    // Collector can stop when everyone is ready, or by timeout. If reason is not 'All Ready' then close the dungeon.
+    collector.on('end', (collected, reason) => {
+        if (!reason == 'All Ready') {
+            message.channel.send(`The party did not ready up in time. Closing the dungeon...`);
+            ducDelete(message, newChannel);
+        }
+    });
+}
+
+function ducDelete(message, newChannel) {
+    console.log(`Deleting channel with id: ${newChannel.id} and name: ${newChannel.name}`);
+    message.guild.channels[newChannel.id].deleted = true;
 }
 
 module.exports = {dungeonSwitch};
