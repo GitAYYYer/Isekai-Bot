@@ -28,7 +28,7 @@ const dungeonList = () => {
 // let newChannel;
 let newChannelID;
 //Dungeon level requirement is limitied by the lowest lvl in party
-const dungeonStart = (message) => {
+const dungeonStart = async (message) => {
     const authorId = message.author.id;
     let partyId = utils.getJsonData(utils.saveDataPath)[authorId]['partyId'];
 
@@ -45,14 +45,15 @@ const dungeonStart = (message) => {
 
             let name = message.author.username;
             const guildChannelManager = message.guild.channels;
-            const newChannel = guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' })
-            .then(console.log("then log"))
-            .catch(console.error);
 
+            // const newChannel = guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' })
+            // .then(console.log)
+            // .catch(console.error);
+            const newChannel = await asyncExample(message, name);
 
+            console.log("newChannel", newChannel);
             newChannelID = newChannel.id;
-            // const channel = guildChannelManager.resolve(newChannel);
-            // channel.delete();
+            console.log("newChannelID", newChannel.id);
 
 
         } else {
@@ -68,21 +69,26 @@ const dungeonDelete = (message) => {
     const channels = message.guild.channels;
     console.log("In delete method 1");
 
-    console.log("Channels", channels);
-    // console.log("Channels", channels.guildChannelManager);
+    let cacheObj;
 
-    // for (let obj in channels.cache) {
-    //     console.log(obj.name);
-    // }
-
-    for (var id in channels.cache) {
-        console.log("id in channel ", id);
-        if (id == newChannelID) {
-            channels[id].deleted = true;
-            console.log("deleted");
+    for (let id in channels){
+        if (id == "cache"){
+            cacheObj = channels[id];
+            for (let obj of cacheObj){
+                if (newChannelID == obj[0]){
+                    console.log("Found match for new channel");
+                    console.log(cacheObj.delete(newChannelID));
+                }
+            }
         }
     }
 
 }
+
+const asyncExample = async (message, name) => {
+    const guildChannelManager = message.guild.channels;
+    const newChannel = await guildChannelManager.create(`${name} dungeon`, { reason: 'Needed a cool new channel' });
+    return newChannel
+  }
 
 module.exports = {dungeonSwitch};
