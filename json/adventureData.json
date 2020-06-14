@@ -1,8 +1,18 @@
 {
-    "1": {
-      "name": "my first adventure",
-      "moneyRewardsRange": [10,13],
-      "itemDrops" : [],
-      "duration": "5000"
-    }
+  "1": {
+    "name": "my first adventure",
+    "moneyRewardsRange": [10,13],
+    "itemDrops" : [],
+    "duration": "5000",
+    "levelReq": 6,
+    "totalStatsReq": 40
+  },
+  "2": {
+    "name": "hard adventure",
+    "moneyRewardsRange": [20,40],
+    "itemDrops" : [],
+    "duration": "5000",
+    "levelReq": 1,
+    "totalStatsReq": 180
   }
+}

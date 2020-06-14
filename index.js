@@ -14,6 +14,7 @@ const partyController = require("./scripts/party.js");
 const shopController = require("./scripts/shop.js");
 const classesController = require("./scripts/classes.js");
 const haremController = require("./scripts/harem.js");
+const dungeonController = require("./scripts/dungeon.js")
 const utils = require("./scripts/isekaiUtils.js");
 
 // constant variables
@@ -115,6 +116,10 @@ bot.on("message", (message) => {
         case "gacha":
             haremController.gachaRoll(message);
             break;
+
+      case "dungeon":
+            dungeonController.dungeonSwitch(message, args);
+            break;
     }
 });
 
@@ -141,7 +146,7 @@ function createNewPlayer(authorId) {
             int: 10,
             vit: 10
         },
-        currentClass: unclassed,
+        currentClass: 'unclassed',
         classes: [{}],
         money: 0,
         partyId: null,
@@ -252,7 +257,7 @@ function train(message) {
         // The maximum xp gain is 10% of your xp needed to level up.
         let maxXpGain = parseInt(currentSaveData[authorId]["xpToNextLevel"]) * 0.1;
 
-        let xpGain = utils.getRandomInt(1000, 2000);
+        let xpGain = utils.getRandomInt(minXpGain, maxXpGain);
         message.channel.send(`You've done your training for the day ${utils.mentionUser(authorId)}! You've gained ${xpGain}XP.`);
         checkLevelUpAndChangeXP(message, currentSaveData, xpGain);
 
@@ -334,14 +339,18 @@ function inventory(message) {
 }
 
 function noPrefixListener(message) {
+    if (message.author.id == '472141928578940958') {
+        message.channel.send('<:ayaya:720228188055273473>');
+    }
     switch (message.content.toLowerCase()) {
         case "garbo":
         case "who":
         case "???":
             message.channel.send("WH <:OMEGALUL:719390337323237410>");
+            break;
         case "no":
             message.channel.send("N <:OMEGALUL:719390337323237410>");
-
+            break;
     }
 }
 

@@ -1,0 +1,19 @@
+{
+    "b001": {
+        "name": "Slime", 
+        "stats": {
+            "combat": {
+                "pAtk": 50,
+                "mAtk": 0,
+                "pDef": 1,
+                "mDef": 1,
+                "currentHP": 500,
+                "maxHP": 500
+            }
+        },
+        "skills": ["s001"],
+        "exp": 25,
+        "drops" : [{"name": "Slime Chunk", "cost": 50}]
+    }
+}
+  
