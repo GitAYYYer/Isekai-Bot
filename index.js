@@ -13,6 +13,7 @@ const adventureController = require("./scripts/adventure.js");
 const partyController = require("./scripts/party.js");
 const shopController = require("./scripts/shop.js");
 const classesController = require("./scripts/classes.js");
+const dungeonController = require("./scripts/dungeon.js")
 const utils = require("./scripts/isekaiUtils.js");
 
 // constant variables
@@ -109,6 +110,9 @@ bot.on("message", (message) => {
 
         case "anime":
             danbooru(message);
+            break;
+        case "dungeon":
+            dungeonController.dungeonSwitch(message, args);
             break;
     }
 });
