@@ -1,6 +1,5 @@
 const utils = require("./isekaiUtils.js");
 const Discord = require("discord.js");
-const guild = new Discord.Guild();
 
 const dungeonSwitch = (message, args) => {
     switch (args[1]) {
@@ -19,10 +18,13 @@ const dungeonSwitch = (message, args) => {
 };
 
 //Hardcode entire dungeon in dungeon.js for now
-const dungeonList = () => {
+const dungeonList = (message) => {
     let dungeons = utils.getJsonData(utils.dungeonPath);
-    
-    message.channel.send()
+    let dungeonList = "";
+    for (var id in dungeons) {
+        dungeonList += `\n${dungeons[id].name}`;
+    }
+    message.channel.send(dungeonList);
 }
 
 let newChannelID;

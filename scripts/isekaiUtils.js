@@ -97,4 +97,4 @@ function display(message) {
 }
 
 module.exports = {checkSaveExists, getUserFromMention, display, getJsonData, getRandomInt, isNull, mentionUser, up, writeJson, 
-    jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath, classesPath, token, prefix};
+    jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath, classesPath, dungeonPath, bossesPath, token, prefix};
