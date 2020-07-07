@@ -13,7 +13,7 @@ const bossesPath = jsonFolder + "/bosses.json";
 const classesPath = jsonFolder + "/classes.json";
 
 // config
-const configFile = require(jsonFolder + "\\config.json");
+const configFile = require(jsonFolder + "/config.json");
 const token = configFile.token;
 const prefix = configFile.prefix;
 
