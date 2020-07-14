@@ -1,6 +1,7 @@
 const utils = require("./isekaiUtils.js");
 const Discord = require("discord.js");
 const guild = new Discord.Guild();
+const axios = require('axios').default;
 
 const dungeonSwitch = (message, args) => {
     switch (args[1]) {
@@ -9,7 +10,8 @@ const dungeonSwitch = (message, args) => {
             dungeonList(message);
             break;
         case "start":
-        dungeonStart(message);
+        // dungeonStart(message);
+        reactDungeonStart(message);
         break;
         case "delete":
             dungeonDelete(message);
@@ -58,6 +60,73 @@ const dungeonStart = async (message) => {
     } else {
         message.channel.send("You have to be in a party to participate in a dungeon.")
     }
+}
+
+/*
+Need to check the user is the leader of their party (only party leader can start)
+Need to do a GET request with user's partyId to check if the party is already in dungeon.
+*/
+async function reactDungeonStart(message) {
+    // TODO Send message to specific user, will need this later
+    // message.client.users.fetch("175880304525836288").then((user) => {
+    //     user.send("Hi");
+    // })
+    /*
+    const authorId = message.author.id;
+    const dungeonURL = 'http://ec2-13-238-89-92.ap-southeast-2.compute.amazonaws.com:3000';
+    const dungeonEmbed = new Discord.MessageEmbed()
+        .setColor('#0099ff')
+        .setTitle('Dungeon #123')
+        .setURL('http://ec2-13-238-89-92.ap-southeast-2.compute.amazonaws.com:3000')
+        .setDescription('This is a description')
+        .addFields(
+            {name: 'Member #1', value: 'Duck Haha'},
+            {name: 'Member #2', value: 'Mot Baloney'},
+            {name: 'Member #3', value: 'Wesley C Lee'}
+        );
+    
+    message.author.send(`Hey there ${utils.mentionUser(authorId)}! To interact with the dungeon, head over to ${dungeonURL} to take part in the dungeon.`);
+    message.author.send(dungeonEmbed);
+    message.client.users.fetch("187817424337240064").then((user) => {
+        user.send(dungeonEmbed);
+    })
+    */
+
+    const authorId = message.author.id;
+    const saveData = utils.getJsonData(utils.saveDataPath);
+    const playerPartyId = saveData[authorId]['partyId'];
+    const allParties = utils.getJsonData(utils.playerPartiesPath);
+
+    const getURL = `http://localhost:3001/check-party-dungeon?partyId=${playerPartyId}`; 
+    const postURL = `http://localhost:3001/create-dungeon`;
+    // const getURL = `http://ec2-13-238-89-92.ap-southeast-2.compute.amazonaws.com:3001/check-party-dungeon?partyId=${playerPartyId}`;
+    // const postURL = `http://ec2-13-238-89-92.ap-southeast-2.compute.amazonaws.com:3001/create-dungeon`;
+
+    // Check message author is leader of their party
+    if (authorId !== allParties[playerPartyId]['leader']) {
+        message.channel.send(`${utils.mentionUser(authorId)}, only the leader of the party can start a dungeon run.`);
+        return;
+    }
+
+    // Make a GET request to check the party does not have an active dungeon running.
+    await axios.get(getURL)
+    .catch(function (error) {
+        message.author.send(`Hey there ${utils.mentionUser(authorId)}! Your party seems to already have an active dungeon running.`);
+        return;
+    });
+
+    // Make POST request to the website, and wait for response
+    await axios.post(postURL, {
+        partyId: String(playerPartyId),
+        partyMembers: allParties[playerPartyId]['members']
+    })
+    .catch(function (error) {
+        // Keep this console log. There should be no error in the post, so if there is, we need to see what the error would be.
+        console.log(error);
+    });
+
+    // Link user to their webpage
+    message.author.send(`Hey there ${utils.mentionUser(authorId)}! Your party is ready to go dungeon running. Head over to our webpage below to interact with the dungeon. (SEND EMBEDDED LINK AS WELL)`);
 }
 
 //Deletes a dungeon by id or name
