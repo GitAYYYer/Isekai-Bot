@@ -1,8 +1,13 @@
 {
     "1": {
-        "name": "Dungeon 1",
+        "name": "1 - Slime Cave",
         "levels": 1,
         "levelReq": 10,
-        "bosses": ["b001"]
+        "timeline": [
+            {
+                "eventType": "boss",
+                "boss": "b001"
+            }
+        ]
     }
 }

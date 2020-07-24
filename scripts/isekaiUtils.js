@@ -8,7 +8,7 @@ const playerAdventuresPath = jsonFolder + "/playerAdventures.json";
 const playerPartiesPath = jsonFolder + "/playerParties.json";
 const cooldownsPath = jsonFolder + "/cooldowns.json";
 const shopPath = jsonFolder + "/shop.json";
-const dungeonPath = jsonFolder + "/dungeon.json";
+const dungeonPath = jsonFolder + "/dungeonData.json";
 const bossesPath = jsonFolder + "/bosses.json";
 const classesPath = jsonFolder + "/classes.json";
 
@@ -96,5 +96,7 @@ function display(message) {
     );
 }
 
-module.exports = {checkSaveExists, getUserFromMention, display, getJsonData, getRandomInt, isNull, mentionUser, up, writeJson, 
-    jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath, classesPath, dungeonPath, bossesPath, token, prefix};
+module.exports = {
+    checkSaveExists, getUserFromMention, display, getJsonData, getRandomInt, isNull, mentionUser, up, writeJson,
+    jsonFolder, saveDataPath, adventureDataPath, cooldownsPath, playerAdventuresPath, shopPath, playerPartiesPath, classesPath, dungeonPath, bossesPath, token, prefix
+};
